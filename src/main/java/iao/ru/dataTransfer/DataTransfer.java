@@ -18,15 +18,13 @@ import javax.swing.JFrame;
  * Created by Zoxy1 on 20.07.17.
  */
 public class DataTransfer {
-    private static SerialPort serialPort;
+    private static final long serialVersion = 2347162171234712347L;
+    //private static SerialPort serialPort;
+    private JTextField fieldInText = new JTextField(10);
+    //static String comPortName;
+    private JButton startButton = new JButton("Start");
 
-    static JTextField fieldInText = new JTextField(10);
-
-
-
-    static String comPortName;
-
-    public static void main(String[] args) {
+    void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -87,7 +85,8 @@ public class DataTransfer {
                 frame.setPreferredSize(new Dimension(270, 225));
                 frame.setLayout(new GridBagLayout());
 
-                JButton startButton = new JButton("Start");
+
+                startButton.addActionListener(new StartButtonActionListener());
 
                 frame.add(fieldInText);
                 frame.add(startButton);
@@ -138,17 +137,39 @@ public class DataTransfer {
         }*/
 
 
-
-
-
-
-
             }
         });
+    }
+
+    public class StartButtonActionListener implements ActionListener {
+
+
+
+
+        public void actionPerformed(ActionEvent e) {
+
+            System.out.println(fieldInText.getText());
+        }
+    }
+
+    public class ActionListenerSelectComPort implements ActionListener {
+
+        String portName;
+        public ActionListenerSelectComPort(String portName) {
+            this.portName = portName;
+        }
+        public void actionPerformed(ActionEvent e) {
+
+            System.out.println(portName);
+        }
+
 
     }
 
 
 }
+
+
+
 
 
