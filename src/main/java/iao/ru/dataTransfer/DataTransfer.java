@@ -26,6 +26,7 @@ public class DataTransfer {
     private JButton closePortButton = new JButton("Close port");
     private JLabel comPortExeption = new JLabel();
     SerialPort serialPortOpen = new SerialPort("COM1");
+    private int portSpeed = 115200;
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -35,21 +36,94 @@ public class DataTransfer {
                 frame.setLocationRelativeTo(null);
                 frame.setExtendedState(JFrame.NORMAL);
                 Font font = new Font("Verdana", Font.PLAIN, 11);
+
                 JMenuBar menuBar = new JMenuBar();
-                JMenu selectComPortMenu = new JMenu("Select COM port");
-                selectComPortMenu.setFont(font);
+                JMenu fileMenu = new JMenu("File");
+                fileMenu.setFont(font);
+                JMenuItem openMenuItem = new JMenuItem("Open");
+                openMenuItem.setFont(font);
+                JMenuItem exitMenuItem = new JMenuItem("Exit");
+                exitMenuItem.setFont(font);
+                exitMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        System.exit(0);
+                    }
+
+                });
+
+                fileMenu.add(openMenuItem);
+                fileMenu.addSeparator();
+                fileMenu.add(exitMenuItem);
+                menuBar.add(fileMenu);
+
+                JMenu settingsMenu = new JMenu("Settings");
+                settingsMenu.setFont(font);
                 String[] portNames = SerialPortList.getPortNames();
+
+                JMenu portMenu = new JMenu("Port");
+                portMenu.setFont(font);
+                settingsMenu.add(portMenu);
+
+                JMenu speedMenu = new JMenu("Speed");
+                speedMenu.setFont(font);
+
+
+                JRadioButtonMenuItem BAUDRATE_110 = new JRadioButtonMenuItem("110");
+                JRadioButtonMenuItem BAUDRATE_300 = new JRadioButtonMenuItem("300");
+                JRadioButtonMenuItem BAUDRATE_600 = new JRadioButtonMenuItem("600");
+                JRadioButtonMenuItem BAUDRATE_1200 = new JRadioButtonMenuItem("1200");
+                JRadioButtonMenuItem BAUDRATE_4800 = new JRadioButtonMenuItem("4800");
+                JRadioButtonMenuItem BAUDRATE_9600 = new JRadioButtonMenuItem("9600");
+                JRadioButtonMenuItem BAUDRATE_14400 = new JRadioButtonMenuItem("14400");
+                JRadioButtonMenuItem BAUDRATE_19200 = new JRadioButtonMenuItem("19200");
+                JRadioButtonMenuItem BAUDRATE_38400 = new JRadioButtonMenuItem("38400");
+                JRadioButtonMenuItem BAUDRATE_57600 = new JRadioButtonMenuItem("57600");
+                JRadioButtonMenuItem BAUDRATE_115200 = new JRadioButtonMenuItem("115200");
+                JRadioButtonMenuItem BAUDRATE_128000 = new JRadioButtonMenuItem("128000");
+                JRadioButtonMenuItem BAUDRATE_256000 = new JRadioButtonMenuItem("256000");
+                BAUDRATE_115200.setSelected(true);
+
+                ButtonGroup buttonGroupSpeed = new ButtonGroup();
+                buttonGroupSpeed.add(BAUDRATE_110);
+                buttonGroupSpeed.add(BAUDRATE_300);
+                buttonGroupSpeed.add(BAUDRATE_600);
+                buttonGroupSpeed.add(BAUDRATE_1200);
+                buttonGroupSpeed.add(BAUDRATE_4800);
+                buttonGroupSpeed.add(BAUDRATE_9600);
+                buttonGroupSpeed.add(BAUDRATE_14400);
+                buttonGroupSpeed.add(BAUDRATE_19200);
+                buttonGroupSpeed.add(BAUDRATE_38400);
+                buttonGroupSpeed.add(BAUDRATE_57600);
+                buttonGroupSpeed.add(BAUDRATE_115200);
+                buttonGroupSpeed.add(BAUDRATE_128000);
+                buttonGroupSpeed.add(BAUDRATE_256000);
+
+                speedMenu.add(BAUDRATE_110);
+                speedMenu.add(BAUDRATE_300);
+                speedMenu.add(BAUDRATE_600);
+                speedMenu.add(BAUDRATE_1200);
+                speedMenu.add(BAUDRATE_4800);
+                speedMenu.add(BAUDRATE_9600);
+                speedMenu.add(BAUDRATE_14400);
+                speedMenu.add(BAUDRATE_19200);
+                speedMenu.add(BAUDRATE_38400);
+                speedMenu.add(BAUDRATE_57600);
+                speedMenu.add(BAUDRATE_115200);
+                speedMenu.add(BAUDRATE_128000);
+                speedMenu.add(BAUDRATE_256000);
+
+                settingsMenu.add(speedMenu);
+
                 JMenuItem comPortItems[] = new JMenuItem[10];
 
                 for (int i = 0; i < portNames.length; i++) {
-                    System.out.println(portNames[i]);
                     comPortItems[i] = new JMenuItem(portNames[i]);
                     comPortItems[i].setFont(font);
-                    selectComPortMenu.add(comPortItems[i]);
+                    portMenu.add(comPortItems[i]);
                     comPortItems[i].addActionListener(new ActionListenerSelectComPort(portNames[i]));
                 }
 
-                menuBar.add(selectComPortMenu);
+                menuBar.add(settingsMenu);
                 frame.setJMenuBar(menuBar);
                 frame.setPreferredSize(new Dimension(600, 300));
                 frame.setLayout(new GridBagLayout());
@@ -128,7 +202,7 @@ public class DataTransfer {
                 //Открываем порт
                 serialPort.openPort();
                 //Выставляем параметры
-                serialPort.setParams(SerialPort.BAUDRATE_9600,
+                serialPort.setParams(portSpeed,
                         SerialPort.DATABITS_8,
                         SerialPort.STOPBITS_1,
                         SerialPort.PARITY_NONE);
@@ -155,7 +229,7 @@ public class DataTransfer {
                         //Открываем порт
                         serialPort.openPort();
                         //Выставляем параметры
-                        serialPort.setParams(SerialPort.BAUDRATE_9600,
+                        serialPort.setParams(portSpeed,
                                 SerialPort.DATABITS_8,
                                 SerialPort.STOPBITS_1,
                                 SerialPort.PARITY_NONE);
