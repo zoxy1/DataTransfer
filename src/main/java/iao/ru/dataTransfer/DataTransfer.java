@@ -32,7 +32,7 @@ public class DataTransfer {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFrame frame = new JFrame("Data Transfer");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null);
                 frame.setExtendedState(JFrame.NORMAL);
                 Font font = new Font("Verdana", Font.PLAIN, 11);
@@ -81,9 +81,25 @@ public class DataTransfer {
                 JRadioButtonMenuItem BAUDRATE_115200 = new JRadioButtonMenuItem("115200");
                 JRadioButtonMenuItem BAUDRATE_128000 = new JRadioButtonMenuItem("128000");
                 JRadioButtonMenuItem BAUDRATE_256000 = new JRadioButtonMenuItem("256000");
+
                 BAUDRATE_115200.setSelected(true);
 
+                BAUDRATE_110.setFont(font);
+                BAUDRATE_300.setFont(font);
+                BAUDRATE_600.setFont(font);
+                BAUDRATE_1200.setFont(font);
+                BAUDRATE_4800.setFont(font);
+                BAUDRATE_9600.setFont(font);
+                BAUDRATE_14400.setFont(font);
+                BAUDRATE_19200.setFont(font);
+                BAUDRATE_38400.setFont(font);
+                BAUDRATE_57600.setFont(font);
+                BAUDRATE_115200.setFont(font);
+                BAUDRATE_128000.setFont(font);
+                BAUDRATE_256000.setFont(font);
+
                 ButtonGroup buttonGroupSpeed = new ButtonGroup();
+
                 buttonGroupSpeed.add(BAUDRATE_110);
                 buttonGroupSpeed.add(BAUDRATE_300);
                 buttonGroupSpeed.add(BAUDRATE_600);
@@ -179,7 +195,7 @@ public class DataTransfer {
 
     public class ActionListenerSelectComPort implements ActionListener {
 
-        String portName;
+        private String portName;
 
         public ActionListenerSelectComPort(String portName) {
             this.portName = portName;
@@ -223,7 +239,7 @@ public class DataTransfer {
 
         public void actionPerformed(ActionEvent e) {
             if (comPortName != null) {
-                if (!(comPortName == serialPortOpen.getPortName() && serialPortOpen.isOpened())) {
+                if (!(comPortName.equals(serialPortOpen.getPortName()) && serialPortOpen.isOpened())) {
                     SerialPort serialPort = new SerialPort(comPortName);
                     try {
                         //Открываем порт
@@ -237,9 +253,9 @@ public class DataTransfer {
                             comPortExeption.setText(serialPort.getPortName() + " is open");
                             serialPortOpen = serialPort;
                         }
-                    } catch (SerialPortException ex) {
-                        System.out.println(ex);
-                        comPortExeption.setText(ex.getExceptionType());
+                    } catch (SerialPortException ex1) {
+                        System.out.println(ex1);
+                        comPortExeption.setText(ex1.getExceptionType());
                     }
                 }else{
                     comPortExeption.setText(serialPortOpen.getPortName() + " already open");
@@ -261,9 +277,9 @@ public class DataTransfer {
                     if(!serialPortOpen.isOpened()){
                         comPortExeption.setText(serialPortOpen.getPortName() + " is closed");
                     }
-                } catch (SerialPortException ex) {
-                    System.out.println(ex);
-                    comPortExeption.setText(ex.getExceptionType());
+                } catch (SerialPortException ex2) {
+                    System.out.println(ex2);
+                    comPortExeption.setText(ex2.getExceptionType());
                 }
 
             } else {
