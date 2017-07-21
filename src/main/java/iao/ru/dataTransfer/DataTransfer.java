@@ -19,11 +19,13 @@ import javax.swing.JFrame;
  */
 public class DataTransfer {
     private static final long serialVersion = 2347162171234712347L;
-    //private static SerialPort serialPort;
     private JTextField fieldInText = new JTextField(10);
-    //static String comPortName;
+    static String comPortName;
     private JButton startButton = new JButton("Start");
-
+    private JButton openPortButton = new JButton("Open port");
+    private JButton closePortButton = new JButton("Close port");
+    private JLabel comPortExeption = new JLabel();
+    SerialPort serialPortOpen = new SerialPort("COM1");
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -32,39 +34,8 @@ public class DataTransfer {
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null);
                 frame.setExtendedState(JFrame.NORMAL);
-                frame.addWindowListener(new WindowListener() {
-                    public void windowOpened(WindowEvent e) {
-
-                    }
-
-                    public void windowClosing(WindowEvent e) {
-                        System.out.println("закрыли сом порт");
-                    }
-
-                    public void windowClosed(WindowEvent e) {
-
-                    }
-
-                    public void windowIconified(WindowEvent e) {
-
-                    }
-
-                    public void windowDeiconified(WindowEvent e) {
-
-                    }
-
-                    public void windowActivated(WindowEvent e) {
-
-                    }
-
-                    public void windowDeactivated(WindowEvent e) {
-
-                    }
-                });
                 Font font = new Font("Verdana", Font.PLAIN, 11);
-
                 JMenuBar menuBar = new JMenuBar();
-
                 JMenu selectComPortMenu = new JMenu("Select COM port");
                 selectComPortMenu.setFont(font);
                 String[] portNames = SerialPortList.getPortNames();
@@ -79,46 +50,20 @@ public class DataTransfer {
                 }
 
                 menuBar.add(selectComPortMenu);
-
                 frame.setJMenuBar(menuBar);
-
-                frame.setPreferredSize(new Dimension(270, 225));
+                frame.setPreferredSize(new Dimension(600, 300));
                 frame.setLayout(new GridBagLayout());
-
-
                 startButton.addActionListener(new StartButtonActionListener());
-
+                openPortButton.addActionListener(new OpenPortActionListener());
+                closePortButton.addActionListener(new ClosePortActionListener());
                 frame.add(fieldInText);
                 frame.add(startButton);
+                frame.add(openPortButton);
+                frame.add(closePortButton);
+                frame.add(comPortExeption);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-
-
-                /*//Передаём в конструктор имя порта
-                SerialPort serialPort = new SerialPort(comPortName);
-                try {
-                    DataTransfer.serialPort.set
-                    //Открываем порт
-                    serialPort.openPort();
-                    //Выставляем параметры
-                    serialPort.setParams(SerialPort.BAUDRATE_9600,
-                            SerialPort.DATABITS_8,
-                            SerialPort.STOPBITS_1,
-                            SerialPort.PARITY_NONE);
-                    //Включаем аппаратное управление потоком
-                    serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                            SerialPort.FLOWCONTROL_RTSCTS_OUT);
-                    //Устанавливаем ивент лисенер и маску
-                    //serialPort.addEventListener(new PortReader(), SerialPort.MASK_RXCHAR);
-                    //Отправляем запрос устройству
-                    //serialPort.writeString("Get data");
-                } catch (SerialPortException ex) {
-                    System.out.println(ex);
-                }*/
-
-
-
 
     /*private static class PortReader implements SerialPortEventListener {
 
@@ -143,11 +88,17 @@ public class DataTransfer {
 
     public class StartButtonActionListener implements ActionListener {
 
-
-
-
         public void actionPerformed(ActionEvent e) {
-
+            if(serialPortOpen.isOpened()){
+                try {
+                    serialPortOpen.writeString(fieldInText.getText());
+                } catch (SerialPortException e1) {
+                    e1.printStackTrace();
+                    comPortExeption.setText(e1.getExceptionType());
+                }
+            }else {
+                comPortExeption.setText("Don`t send " + serialPortOpen.getPortName()+" is closed");
+            }
             System.out.println(fieldInText.getText());
         }
     }
@@ -155,18 +106,98 @@ public class DataTransfer {
     public class ActionListenerSelectComPort implements ActionListener {
 
         String portName;
+
         public ActionListenerSelectComPort(String portName) {
             this.portName = portName;
         }
+
         public void actionPerformed(ActionEvent e) {
+            comPortName = portName;
+            if (serialPortOpen.isOpened()) {
+                try {
+                    serialPortOpen.closePort();
+                } catch (SerialPortException e1) {
+                    e1.printStackTrace();
+                    comPortExeption.setText(e1.getExceptionType());
+                }
+            }
 
-            System.out.println(portName);
+
+            SerialPort serialPort = new SerialPort(comPortName);
+            try {
+                //Открываем порт
+                serialPort.openPort();
+                //Выставляем параметры
+                serialPort.setParams(SerialPort.BAUDRATE_9600,
+                        SerialPort.DATABITS_8,
+                        SerialPort.STOPBITS_1,
+                        SerialPort.PARITY_NONE);
+                if (serialPort.isOpened()) {
+                    comPortExeption.setText(serialPort.getPortName() + " is open");
+                    serialPortOpen = serialPort;
+                }
+            } catch (SerialPortException ex) {
+                System.out.println(ex);
+                comPortExeption.setText(ex.getExceptionType());
+            }
+            System.out.println(comPortName);
         }
-
 
     }
 
+    public class OpenPortActionListener implements ActionListener {
 
+        public void actionPerformed(ActionEvent e) {
+            if (comPortName != null) {
+                if (!(comPortName == serialPortOpen.getPortName() && serialPortOpen.isOpened())) {
+                    SerialPort serialPort = new SerialPort(comPortName);
+                    try {
+                        //Открываем порт
+                        serialPort.openPort();
+                        //Выставляем параметры
+                        serialPort.setParams(SerialPort.BAUDRATE_9600,
+                                SerialPort.DATABITS_8,
+                                SerialPort.STOPBITS_1,
+                                SerialPort.PARITY_NONE);
+                        if (serialPort.isOpened()) {
+                            comPortExeption.setText(serialPort.getPortName() + " is open");
+                            serialPortOpen = serialPort;
+                        }
+                    } catch (SerialPortException ex) {
+                        System.out.println(ex);
+                        comPortExeption.setText(ex.getExceptionType());
+                    }
+                }else{
+                    comPortExeption.setText(serialPortOpen.getPortName() + " already open");
+                }
+            } else {
+                comPortExeption.setText("Com port don`t selected");
+                System.out.println("Com port don`t selected");
+            }
+        }
+    }
+
+    public class ClosePortActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            if (comPortName != null) {
+                try {
+                    serialPortOpen.closePort();
+
+                    if(!serialPortOpen.isOpened()){
+                        comPortExeption.setText(serialPortOpen.getPortName() + " is closed");
+                    }
+                } catch (SerialPortException ex) {
+                    System.out.println(ex);
+                    comPortExeption.setText(ex.getExceptionType());
+                }
+
+            } else {
+                comPortExeption.setText("Com port don`t selected");
+                System.out.println("Com port don`t selected");
+            }
+        }
+    }
 }
 
 
