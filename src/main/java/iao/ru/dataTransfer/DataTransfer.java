@@ -5,15 +5,14 @@ import javax.swing.*;
 
 import jssc.*;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
 /**
  * Created by Zoxy1 on 20.07.17.
@@ -22,9 +21,8 @@ public class DataTransfer {
     private static final long serialVersion = 2347162171234712347L;
     private JTextField fieldInText = new JTextField(10);
     static String comPortName;
-    private JButton startButton = new JButton("Start");
-    private JButton openPortButton = new JButton("Open port");
-    private JButton closePortButton = new JButton("Close port");
+    private JButton sendPicture = new JButton("Send picture");
+    private JButton sendText = new JButton("Send text");
     private JLabel comPortExeption = new JLabel();
     SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
@@ -107,19 +105,73 @@ public class DataTransfer {
 
                 menuBar.add(settingsMenu);
                 frame.setJMenuBar(menuBar);
-                frame.setPreferredSize(new Dimension(600, 300));
+                frame.setPreferredSize(new Dimension(500, 500));
                 frame.setLayout(new GridBagLayout());
-                startButton.addActionListener(new StartButtonActionListener());
-                openPortButton.addActionListener(new OpenPortActionListener());
-                closePortButton.addActionListener(new ClosePortActionListener());
-                frame.add(fieldInText);
-                frame.add(startButton);
-                frame.add(openPortButton);
-                frame.add(closePortButton);
-                frame.add(comPortExeption);
+                JPanel picturePanel = new JPanel();
+                picturePanel.setBackground(new Color(255,121,232));
+                picturePanel.setLayout(new GridBagLayout());
+                picturePanel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.gray, 2),
+                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+                picturePanel.setVisible(true);
+                JLabel pictureLabel = new JLabel("Имя файла картинки");
+                picturePanel.add(pictureLabel);
+                GridBagConstraints  gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0; // расположение элемента по х
+                gridBagConstraints.gridy = 0; // расположение элемента по y
+                gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
+                gridBagConstraints.gridheight = 1; // количество элементов, которое будет занимать  по вертикали
+                gridBagConstraints.weightx = 0.9; //как должна осуществляться растяжка компонента
+                gridBagConstraints.weighty = 0.9;
+                gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+                gridBagConstraints.fill = GridBagConstraints.BOTH;
+                gridBagConstraints.insets = new Insets(1, 1, 1 ,1); // отступы от компонета (top, left, down, right)
+                gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
+                gridBagConstraints.ipady = 0;
+
+                frame.add(picturePanel, gridBagConstraints);
+
+                JPanel buttonPanel = new JPanel();
+                buttonPanel.setBackground(new Color(123,221,199,254));
+                //JLabel bottonLabel = new JLabel("Панель кнопок");
+                //buttonPanel.add(bottonLabel);
+
+                buttonPanel.add(sendPicture);
+                buttonPanel.setLayout(new GridBagLayout());
+                frame.add(buttonPanel, new GridBagConstraints(0,1, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
+
+                JProgressBar progressBar = new JProgressBar();
+                progressBar.setMinimum(0);
+                progressBar.setMaximum(100);
+                progressBar.setValue(50);
+                progressBar.setStringPainted(true);
+                progressBar.setLayout(new GridBagLayout());
+                progressBar.setMinimumSize(new Dimension(100,20));
+                progressBar.setPreferredSize(new Dimension(300,20));
+
+                progressBar.setForeground(Color.green);
+                frame.add(progressBar, new GridBagConstraints(1,1, 1,1 ,0.9,0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1,1,1,1), 0,0));
+
+                sendText.setLayout(new GridBagLayout());
+                sendText.addActionListener(new SendTextButtonActionListener());
+                frame.add(sendText, new GridBagConstraints(0,2, 1,1 ,0.0,0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+
+                fieldInText.setLayout(new GridBagLayout());
+                frame.add(fieldInText, new GridBagConstraints(1,2, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+                comPortExeption.setText("Select COM port");
+                comPortExeption.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.gray, 2),
+                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+                //comPortExeption
+                frame.add(comPortExeption, new GridBagConstraints(0,3, 2,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
+                //frame.add(fieldInText);
+                //frame.add(sendPicture);
+               // frame.add(comPortExeption);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
+
+
 
     /*private static class PortReader implements SerialPortEventListener {
 
@@ -142,7 +194,7 @@ public class DataTransfer {
         });
     }
 
-    public class StartButtonActionListener implements ActionListener {
+    public class SendTextButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             if (serialPortOpen.isOpened()) {
@@ -199,60 +251,6 @@ public class DataTransfer {
             System.out.println(comPortName);
         }
 
-    }
-
-    public class OpenPortActionListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            if (comPortName != null) {
-                if (!(comPortName.equals(serialPortOpen.getPortName()) && serialPortOpen.isOpened())) {
-                    SerialPort serialPort = new SerialPort(comPortName);
-                    try {
-                        //Открываем порт
-                        serialPort.openPort();
-                        //Выставляем параметры
-                        serialPort.setParams(portSpeed,
-                                SerialPort.DATABITS_8,
-                                SerialPort.STOPBITS_1,
-                                SerialPort.PARITY_NONE);
-                        if (serialPort.isOpened()) {
-                            comPortExeption.setText(serialPort.getPortName() + " is open");
-                            serialPortOpen = serialPort;
-                        }
-                    } catch (SerialPortException ex1) {
-                        System.out.println(ex1);
-                        comPortExeption.setText(ex1.getExceptionType());
-                    }
-                } else {
-                    comPortExeption.setText(serialPortOpen.getPortName() + " already open");
-                }
-            } else {
-                comPortExeption.setText("Com port don`t selected");
-                System.out.println("Com port don`t selected");
-            }
-        }
-    }
-
-    public class ClosePortActionListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            if (comPortName != null) {
-                try {
-                    serialPortOpen.closePort();
-
-                    if (!serialPortOpen.isOpened()) {
-                        comPortExeption.setText(serialPortOpen.getPortName() + " is closed");
-                    }
-                } catch (SerialPortException ex2) {
-                    System.out.println(ex2);
-                    comPortExeption.setText(ex2.getExceptionType());
-                }
-
-            } else {
-                comPortExeption.setText("Com port don`t selected");
-                System.out.println("Com port don`t selected");
-            }
-        }
     }
 
     public class BaundRateActionListener implements ActionListener {
