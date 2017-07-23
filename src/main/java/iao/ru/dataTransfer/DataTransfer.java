@@ -63,7 +63,7 @@ public class DataTransfer {
                 settingsMenu.setFont(font);
                 String[] portNames = SerialPortList.getPortNames();
 
-                JMenu portMenu = new JMenu("Port");
+                JMenu portMenu = new JMenu("Ports available");
                 portMenu.setFont(font);
                 settingsMenu.add(portMenu);
 
@@ -97,13 +97,12 @@ public class DataTransfer {
 
                 settingsMenu.add(speedMenu);
 
-                JMenuItem comPortItems[] = new JMenuItem[10];
-
+                ArrayList<JMenuItem> comPortItems = new ArrayList<JMenuItem>();
                 for (int i = 0; i < portNames.length; i++) {
-                    comPortItems[i] = new JMenuItem(portNames[i]);
-                    comPortItems[i].setFont(font);
-                    portMenu.add(comPortItems[i]);
-                    comPortItems[i].addActionListener(new ActionListenerSelectComPort(portNames[i]));
+                    comPortItems.add(new JMenuItem(portNames[i]));
+                    comPortItems.get(i).setFont(font);
+                    portMenu.add(comPortItems.get(i));
+                    comPortItems.get(i).addActionListener(new ActionListenerSelectComPort(portNames[i]));
                 }
 
                 menuBar.add(settingsMenu);
@@ -264,7 +263,7 @@ public class DataTransfer {
 
                 if (speedItem.isSelected()) {
                     portSpeed = Integer.parseInt(speedItem.getText());
-                    comPortExeption.setText("Select " + serialPortOpen.getPortName() + " speed = " + portSpeed);
+                    comPortExeption.setText("Select speed = " + portSpeed);
                 }
             }
         }
