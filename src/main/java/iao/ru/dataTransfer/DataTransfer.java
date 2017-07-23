@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -27,6 +28,8 @@ public class DataTransfer {
     private JLabel comPortExeption = new JLabel();
     SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
+    private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
+
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -67,66 +70,30 @@ public class DataTransfer {
                 JMenu speedMenu = new JMenu("Speed");
                 speedMenu.setFont(font);
 
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("110"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("300"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("600"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("1200"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("4800"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("9600"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("14400"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("1920"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("38400"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("57600"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("115200"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("128000"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("256000"));
 
-                JRadioButtonMenuItem BAUDRATE_110 = new JRadioButtonMenuItem("110");
-                JRadioButtonMenuItem BAUDRATE_300 = new JRadioButtonMenuItem("300");
-                JRadioButtonMenuItem BAUDRATE_600 = new JRadioButtonMenuItem("600");
-                JRadioButtonMenuItem BAUDRATE_1200 = new JRadioButtonMenuItem("1200");
-                JRadioButtonMenuItem BAUDRATE_4800 = new JRadioButtonMenuItem("4800");
-                JRadioButtonMenuItem BAUDRATE_9600 = new JRadioButtonMenuItem("9600");
-                JRadioButtonMenuItem BAUDRATE_14400 = new JRadioButtonMenuItem("14400");
-                JRadioButtonMenuItem BAUDRATE_19200 = new JRadioButtonMenuItem("19200");
-                JRadioButtonMenuItem BAUDRATE_38400 = new JRadioButtonMenuItem("38400");
-                JRadioButtonMenuItem BAUDRATE_57600 = new JRadioButtonMenuItem("57600");
-                JRadioButtonMenuItem BAUDRATE_115200 = new JRadioButtonMenuItem("115200");
-                JRadioButtonMenuItem BAUDRATE_128000 = new JRadioButtonMenuItem("128000");
-                JRadioButtonMenuItem BAUDRATE_256000 = new JRadioButtonMenuItem("256000");
-
-                BAUDRATE_115200.setSelected(true);
-
-                BAUDRATE_110.setFont(font);
-                BAUDRATE_300.setFont(font);
-                BAUDRATE_600.setFont(font);
-                BAUDRATE_1200.setFont(font);
-                BAUDRATE_4800.setFont(font);
-                BAUDRATE_9600.setFont(font);
-                BAUDRATE_14400.setFont(font);
-                BAUDRATE_19200.setFont(font);
-                BAUDRATE_38400.setFont(font);
-                BAUDRATE_57600.setFont(font);
-                BAUDRATE_115200.setFont(font);
-                BAUDRATE_128000.setFont(font);
-                BAUDRATE_256000.setFont(font);
+                jRadioButtonSpeedMenuItems.get(10).setSelected(true);
 
                 ButtonGroup buttonGroupSpeed = new ButtonGroup();
 
-                buttonGroupSpeed.add(BAUDRATE_110);
-                buttonGroupSpeed.add(BAUDRATE_300);
-                buttonGroupSpeed.add(BAUDRATE_600);
-                buttonGroupSpeed.add(BAUDRATE_1200);
-                buttonGroupSpeed.add(BAUDRATE_4800);
-                buttonGroupSpeed.add(BAUDRATE_9600);
-                buttonGroupSpeed.add(BAUDRATE_14400);
-                buttonGroupSpeed.add(BAUDRATE_19200);
-                buttonGroupSpeed.add(BAUDRATE_38400);
-                buttonGroupSpeed.add(BAUDRATE_57600);
-                buttonGroupSpeed.add(BAUDRATE_115200);
-                buttonGroupSpeed.add(BAUDRATE_128000);
-                buttonGroupSpeed.add(BAUDRATE_256000);
-
-                speedMenu.add(BAUDRATE_110);
-                speedMenu.add(BAUDRATE_300);
-                speedMenu.add(BAUDRATE_600);
-                speedMenu.add(BAUDRATE_1200);
-                speedMenu.add(BAUDRATE_4800);
-                speedMenu.add(BAUDRATE_9600);
-                speedMenu.add(BAUDRATE_14400);
-                speedMenu.add(BAUDRATE_19200);
-                speedMenu.add(BAUDRATE_38400);
-                speedMenu.add(BAUDRATE_57600);
-                speedMenu.add(BAUDRATE_115200);
-                speedMenu.add(BAUDRATE_128000);
-                speedMenu.add(BAUDRATE_256000);
+                for (JRadioButtonMenuItem speedItem : jRadioButtonSpeedMenuItems) {
+                    speedItem.setFont(font);
+                    buttonGroupSpeed.add(speedItem);
+                    speedMenu.add(speedItem);
+                    speedItem.addActionListener(new BaundRateActionListener());
+                }
 
                 settingsMenu.add(speedMenu);
 
@@ -179,15 +146,15 @@ public class DataTransfer {
     public class StartButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            if(serialPortOpen.isOpened()){
+            if (serialPortOpen.isOpened()) {
                 try {
                     serialPortOpen.writeString(fieldInText.getText());
                 } catch (SerialPortException e1) {
                     e1.printStackTrace();
                     comPortExeption.setText(e1.getExceptionType());
                 }
-            }else {
-                comPortExeption.setText("Don`t send " + serialPortOpen.getPortName()+" is closed");
+            } else {
+                comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
             }
             System.out.println(fieldInText.getText());
         }
@@ -257,7 +224,7 @@ public class DataTransfer {
                         System.out.println(ex1);
                         comPortExeption.setText(ex1.getExceptionType());
                     }
-                }else{
+                } else {
                     comPortExeption.setText(serialPortOpen.getPortName() + " already open");
                 }
             } else {
@@ -274,7 +241,7 @@ public class DataTransfer {
                 try {
                     serialPortOpen.closePort();
 
-                    if(!serialPortOpen.isOpened()){
+                    if (!serialPortOpen.isOpened()) {
                         comPortExeption.setText(serialPortOpen.getPortName() + " is closed");
                     }
                 } catch (SerialPortException ex2) {
@@ -285,6 +252,20 @@ public class DataTransfer {
             } else {
                 comPortExeption.setText("Com port don`t selected");
                 System.out.println("Com port don`t selected");
+            }
+        }
+    }
+
+    public class BaundRateActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+
+            for (JRadioButtonMenuItem speedItem : jRadioButtonSpeedMenuItems) {
+
+                if (speedItem.isSelected()) {
+                    portSpeed = Integer.parseInt(speedItem.getText());
+                    comPortExeption.setText("Select " + serialPortOpen.getPortName() + " speed = " + portSpeed);
+                }
             }
         }
     }
