@@ -1,6 +1,7 @@
 package iao.ru.dataTransfer;
 
 import java.awt.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import jssc.*;
@@ -8,6 +9,7 @@ import jssc.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -29,7 +31,9 @@ public class DataTransfer {
     private int portSpeed = 115200;
     private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
     private JLabel pictureLabel = new JLabel("Open picture(BMP)");
+    private JLabel picture = new JLabel("Picture");
     private File file;
+    private ImagePanel pp = new ImagePanel();
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -110,32 +114,38 @@ public class DataTransfer {
                 frame.setJMenuBar(menuBar);
                 frame.setPreferredSize(new Dimension(500, 500));
                 frame.setLayout(new GridBagLayout());
-                JPanel picturePanel = new JPanel();
-                picturePanel.setBackground(new Color(255,121,232));
-                picturePanel.setLayout(new GridBagLayout());
-                picturePanel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Color.gray, 2),
-                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-                picturePanel.setVisible(true);
+                JPanel filePathPanel = new JPanel();
+                filePathPanel.add(pictureLabel);
+                //pictureLabel.setLayout(new GridBagLayout());
+                filePathPanel.setLayout(new GridBagLayout());
+                frame.add(filePathPanel, new GridBagConstraints(0,0, 2,1 ,0.0,0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
 
-                picturePanel.add(pictureLabel);
+                //JPanel picturePanel = new JPanel();
+
+                //picturePanel1.setBackground(new Color(255,121,232));
+
+               /* pp.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.gray, 2),
+                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));*/
+                //picturePanel.setVisible(true);
+
                 GridBagConstraints  gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
-                gridBagConstraints.gridy = 0; // расположение элемента по y
+                gridBagConstraints.gridy = 1; // расположение элемента по y
                 gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
                 gridBagConstraints.gridheight = 1; // количество элементов, которое будет занимать  по вертикали
                 gridBagConstraints.weightx = 0.9; //как должна осуществляться растяжка компонента
                 gridBagConstraints.weighty = 0.9;
-                gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+                gridBagConstraints.anchor = GridBagConstraints.CENTER;
                 gridBagConstraints.fill = GridBagConstraints.BOTH;
                 gridBagConstraints.insets = new Insets(1, 1, 1 ,1); // отступы от компонета (top, left, down, right)
                 gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
                 gridBagConstraints.ipady = 0;
+                frame.add(pp, gridBagConstraints);
 
-                frame.add(picturePanel, gridBagConstraints);
 
                 sendPicture.setLayout(new GridBagLayout());
-                frame.add(sendPicture, new GridBagConstraints(0,1, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
+                frame.add(sendPicture, new GridBagConstraints(0,2, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
 
                 JProgressBar progressBar = new JProgressBar();
                 progressBar.setMinimum(0);
@@ -147,20 +157,20 @@ public class DataTransfer {
                 progressBar.setPreferredSize(new Dimension(300,20));
 
                 progressBar.setForeground(Color.green);
-                frame.add(progressBar, new GridBagConstraints(1,1, 1,1 ,0.9,0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1,1,1,1), 0,0));
+                frame.add(progressBar, new GridBagConstraints(1,2, 1,1 ,0.9,0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1,1,1,1), 0,0));
 
                 sendText.setLayout(new GridBagLayout());
                 sendText.addActionListener(new SendTextButtonActionListener());
-                frame.add(sendText, new GridBagConstraints(0,2, 1,1 ,0.0,0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+                frame.add(sendText, new GridBagConstraints(0,3, 1,1 ,0.0,0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
 
                 fieldInText.setLayout(new GridBagLayout());
-                frame.add(fieldInText, new GridBagConstraints(1,2, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+                frame.add(fieldInText, new GridBagConstraints(1,3, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
                 comPortExeption.setText("Select COM port");
                 comPortExeption.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
                 //comPortExeption
-                frame.add(comPortExeption, new GridBagConstraints(0,3, 2,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
+                frame.add(comPortExeption, new GridBagConstraints(0,4, 2,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
                 //frame.add(fieldInText);
                 //frame.add(sendPicture);
                // frame.add(comPortExeption);
@@ -284,6 +294,17 @@ public class DataTransfer {
                 }
                 if (file.isFile()) {
                     pictureLabel.setText(file.getAbsolutePath());
+
+                    ImagePanel pp = new ImagePanel();
+                    pp.setLayout(new BorderLayout());
+                    try {
+                        pp.setImage(ImageIO.read(file));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    pp.setPreferredSize(new Dimension(10000, 10000));
+
                 }
 
             } else {
