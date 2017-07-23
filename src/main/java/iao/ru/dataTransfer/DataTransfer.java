@@ -7,6 +7,7 @@ import jssc.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -27,7 +28,8 @@ public class DataTransfer {
     SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
     private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
-
+    private JLabel pictureLabel = new JLabel("Open picture(BMP)");
+    private File file;
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -42,6 +44,7 @@ public class DataTransfer {
                 JMenu fileMenu = new JMenu("File");
                 fileMenu.setFont(font);
                 JMenuItem openMenuItem = new JMenuItem("Open");
+                openMenuItem.addActionListener(new OpenActionListener());
                 openMenuItem.setFont(font);
                 JMenuItem exitMenuItem = new JMenuItem("Exit");
                 exitMenuItem.setFont(font);
@@ -114,7 +117,7 @@ public class DataTransfer {
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
                 picturePanel.setVisible(true);
-                JLabel pictureLabel = new JLabel("Имя файла картинки");
+
                 picturePanel.add(pictureLabel);
                 GridBagConstraints  gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
@@ -131,14 +134,8 @@ public class DataTransfer {
 
                 frame.add(picturePanel, gridBagConstraints);
 
-                JPanel buttonPanel = new JPanel();
-                buttonPanel.setBackground(new Color(123,221,199,254));
-                //JLabel bottonLabel = new JLabel("Панель кнопок");
-                //buttonPanel.add(bottonLabel);
-
-                buttonPanel.add(sendPicture);
-                buttonPanel.setLayout(new GridBagLayout());
-                frame.add(buttonPanel, new GridBagConstraints(0,1, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
+                sendPicture.setLayout(new GridBagLayout());
+                frame.add(sendPicture, new GridBagConstraints(0,1, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
 
                 JProgressBar progressBar = new JProgressBar();
                 progressBar.setMinimum(0);
@@ -266,6 +263,38 @@ public class DataTransfer {
             }
         }
     }
+    public class OpenActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+
+            JFileChooser fileopen = new JFileChooser();
+
+            fileopen.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
+            int ret = fileopen.showDialog(null, "Open");
+
+            if (ret == JFileChooser.APPROVE_OPTION) {
+
+                file = fileopen.getSelectedFile();
+
+                if (file.isDirectory()) {
+                    comPortExeption.setText(file.getAbsolutePath());
+                    System.out.println("Path to file: " + file.getAbsolutePath());
+
+                }
+                if (file.isFile()) {
+                    pictureLabel.setText(file.getAbsolutePath());
+                }
+
+            } else {
+                System.out.println("���� ��� ���������� �� �������");
+
+
+            }
+        }
+    }
+
+
 }
 
 
