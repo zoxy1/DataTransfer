@@ -308,10 +308,7 @@ public class DataTransfer {
 
                 imagePanel = imagePanelNew;
                 frame.add(imagePanelNew, gridBagConstraints);
-                pictureLabel.setText(file.getAbsolutePath()+" (width="+bufferedImage.getWidth()+", height="+bufferedImage.getHeight()+")");
-                System.out.println(bufferedImage.getHeight());
-                System.out.println(bufferedImage.getWidth());
-
+                pictureLabel.setText(file.getAbsolutePath()+" (width="+bufferedImage.getWidth()+", height="+ bufferedImage.getHeight()+")");
                 comPortExeption.setText("File " + file.getName() + " is opened");
 
             } else {
@@ -323,10 +320,13 @@ public class DataTransfer {
     public class SendPictureButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-          BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_3BYTE_BGR);
-            Graphics2D g = scaleImage.createGraphics();
-            g.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
-            g.dispose();
+          BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_BYTE_GRAY);
+            Graphics2D graphics = scaleImage.createGraphics();
+            graphics.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
+            graphics.dispose();
+            int rgba = scaleImage.getRGB(0,0);
+            Color color = new Color(rgba, true);
+            int r = color.getRed();
 
                /* int [] rgbMass = bufferedImageBMP.getRGB(0,0,imagePanel.getWidth(),imagePanel.getWidth(),null, 0, imagePanel.getWidth());
                 int rgba = rgbMass[0];
