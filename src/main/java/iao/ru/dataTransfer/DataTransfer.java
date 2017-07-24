@@ -6,6 +6,7 @@ import javax.swing.*;
 import jssc.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class DataTransfer {
     private File file;
     private ImagePanel imagePanel = new ImagePanel();
     private JFrame frame = new JFrame("Data Transfer");
+    private BufferedImage bufferedImage;
 
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -139,6 +141,7 @@ public class DataTransfer {
 
                 sendPictureButton.setLayout(new GridBagLayout());
                 frame.add(sendPictureButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
+                sendPictureButton.addActionListener(new SendPictureButtonActionListener());
 
                 JProgressBar progressBar = new JProgressBar();
                 progressBar.setMinimum(0);
@@ -270,7 +273,7 @@ public class DataTransfer {
 
             JFileChooser fileopen = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                    "Pictures(jpg, bmp, png)", "jpg", "bmp", "png");
+                    "Pictures (jpg, bmp)", "jpg", "bmp");
             fileopen.setFileFilter(filter);
             fileopen.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
@@ -280,18 +283,16 @@ public class DataTransfer {
 
                 file = fileopen.getSelectedFile();
 
-                pictureLabel.setText(file.getAbsolutePath());
-
                 frame.remove(imagePanel);
                 ImagePanel imagePanelNew = new ImagePanel();
 
                 try {
-
-                    System.out.println(ImageIO.read(file).getType());
-                    imagePanelNew.setImage(ImageIO.read(file));
+                    bufferedImage = ImageIO.read(file);
+                    imagePanelNew.setImage(bufferedImage);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+
                 GridBagConstraints gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
                 gridBagConstraints.gridy = 1; // расположение элемента по y
@@ -304,15 +305,44 @@ public class DataTransfer {
                 gridBagConstraints.insets = new Insets(1, 1, 1, 1); // отступы от компонета (top, left, down, right)
                 gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
                 gridBagConstraints.ipady = 0;
-                        /*imagePanelNew.setAutoscrolls(true);
-                        imagePanelNew.setMinimumSize(new Dimension(163, 100));
-                        imagePanelNew.setPreferredSize(new Dimension(490, 300));*/
+
                 imagePanel = imagePanelNew;
                 frame.add(imagePanelNew, gridBagConstraints);
+                pictureLabel.setText(file.getAbsolutePath()+" (width="+bufferedImage.getWidth()+", height="+bufferedImage.getHeight()+")");
+                System.out.println(bufferedImage.getHeight());
+                System.out.println(bufferedImage.getWidth());
+
                 comPortExeption.setText("File " + file.getName() + " is opened");
+
             } else {
                 comPortExeption.setText("File don`t selected");
             }
+        }
+    }
+
+    public class SendPictureButtonActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+          BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_3BYTE_BGR);
+            Graphics2D g = scaleImage.createGraphics();
+            g.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
+            g.dispose();
+
+               /* int [] rgbMass = bufferedImageBMP.getRGB(0,0,imagePanel.getWidth(),imagePanel.getWidth(),null, 0, imagePanel.getWidth());
+                int rgba = rgbMass[0];
+                Color color = new Color(rgba, true);
+                int r = color.getRed();
+                int g = color.getGreen();
+                int b = color.getBlue();
+
+                int length = rgbMass.length;*/
+
+               try {
+                    ImageIO.write(scaleImage, "bmp", new File("c:\\testfoto.bmp"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                comPortExeption.setText("Send picture...");
         }
     }
 }
