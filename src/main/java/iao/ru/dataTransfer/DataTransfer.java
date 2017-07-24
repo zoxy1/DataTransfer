@@ -24,7 +24,7 @@ public class DataTransfer {
     private static final long serialVersion = 2347162171234712347L;
     private JTextField fieldInText = new JTextField(10);
     static String comPortName;
-    private JButton sendPicture = new JButton("Send picture");
+    private JButton sendPictureButton = new JButton("Send picture");
     private JButton sendText = new JButton("Send text");
     private JLabel comPortExeption = new JLabel();
     SerialPort serialPortOpen = new SerialPort("COM1");
@@ -33,12 +33,14 @@ public class DataTransfer {
     private JLabel pictureLabel = new JLabel("Open picture(BMP)");
     private JLabel picture = new JLabel("Picture");
     private File file;
-    private ImagePanel pp = new ImagePanel();
+    private ImagePanel imagePanel = new ImagePanel();
+    private JFrame frame = new JFrame("Data Transfer");
+    private PicturePanel picturePanel1 = new PicturePanel();
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JFrame frame = new JFrame("Data Transfer");
+
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null);
                 frame.setExtendedState(JFrame.NORMAL);
@@ -124,12 +126,12 @@ public class DataTransfer {
 
                 //picturePanel1.setBackground(new Color(255,121,232));
 
-               /* pp.setBorder(BorderFactory.createCompoundBorder(
+                imagePanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
-                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));*/
-                //picturePanel.setVisible(true);
+                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 
-                GridBagConstraints  gridBagConstraints = new GridBagConstraints();
+
+                GridBagConstraints gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
                 gridBagConstraints.gridy = 1; // расположение элемента по y
                 gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
@@ -138,14 +140,17 @@ public class DataTransfer {
                 gridBagConstraints.weighty = 0.9;
                 gridBagConstraints.anchor = GridBagConstraints.CENTER;
                 gridBagConstraints.fill = GridBagConstraints.BOTH;
-                gridBagConstraints.insets = new Insets(1, 1, 1 ,1); // отступы от компонета (top, left, down, right)
+                gridBagConstraints.insets = new Insets(1, 1, 1, 1); // отступы от компонета (top, left, down, right)
                 gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
                 gridBagConstraints.ipady = 0;
-                frame.add(pp, gridBagConstraints);
+                imagePanel.setAutoscrolls(true);
+                imagePanel.setMinimumSize(new Dimension(163, 100));
+                imagePanel.setPreferredSize(new Dimension(490, 300));
+                frame.add(imagePanel, gridBagConstraints);
 
 
-                sendPicture.setLayout(new GridBagLayout());
-                frame.add(sendPicture, new GridBagConstraints(0,2, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
+                sendPictureButton.setLayout(new GridBagLayout());
+                frame.add(sendPictureButton, new GridBagConstraints(0,2, 1,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
 
                 JProgressBar progressBar = new JProgressBar();
                 progressBar.setMinimum(0);
@@ -172,7 +177,7 @@ public class DataTransfer {
                 //comPortExeption
                 frame.add(comPortExeption, new GridBagConstraints(0,4, 2,1 ,0.0,0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0,0));
                 //frame.add(fieldInText);
-                //frame.add(sendPicture);
+
                // frame.add(comPortExeption);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
@@ -295,6 +300,33 @@ public class DataTransfer {
                 if (file.isFile()) {
                     pictureLabel.setText(file.getAbsolutePath());
 
+                    frame.remove(imagePanel);
+                    ImagePanel imagePanelNew = new ImagePanel();
+
+                    try {
+                        imagePanelNew.setImage(ImageIO.read(file));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    GridBagConstraints gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 0; // расположение элемента по х
+                        gridBagConstraints.gridy = 1; // расположение элемента по y
+                        gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
+                        gridBagConstraints.gridheight = 1; // количество элементов, которое будет занимать  по вертикали
+                        gridBagConstraints.weightx = 0.9; //как должна осуществляться растяжка компонента
+                        gridBagConstraints.weighty = 0.9;
+                        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+                        gridBagConstraints.fill = GridBagConstraints.BOTH;
+                        gridBagConstraints.insets = new Insets(1, 1, 1, 1); // отступы от компонета (top, left, down, right)
+                        gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
+                        gridBagConstraints.ipady = 0;
+                        imagePanelNew.setAutoscrolls(true);
+                        imagePanelNew.setMinimumSize(new Dimension(163, 100));
+                        imagePanelNew.setPreferredSize(new Dimension(490, 300));
+                        imagePanel = imagePanelNew;
+                        frame.add(imagePanelNew, gridBagConstraints);
+
+                    /*frame.remove(pp);
                     ImagePanel pp = new ImagePanel();
                     pp.setLayout(new BorderLayout());
                     try {
@@ -303,7 +335,23 @@ public class DataTransfer {
                         e1.printStackTrace();
                     }
 
-                    pp.setPreferredSize(new Dimension(10000, 10000));
+                    //pp.setPreferredSize(new Dimension(500, 500));
+                    pp.setAutoscrolls(true);
+                    GridBagConstraints  gridBagConstraints = new GridBagConstraints();
+                    gridBagConstraints.gridx = 0; // расположение элемента по х
+                    gridBagConstraints.gridy = 1; // расположение элемента по y
+                    gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
+                    gridBagConstraints.gridheight = 1; // количество элементов, которое будет занимать  по вертикали
+                    gridBagConstraints.weightx = 0.9; //как должна осуществляться растяжка компонента
+                    gridBagConstraints.weighty = 0.9;
+                    gridBagConstraints.anchor = GridBagConstraints.CENTER;
+                    gridBagConstraints.fill = GridBagConstraints.NONE;
+                    gridBagConstraints.insets = new Insets(1, 1, 1 ,1); // отступы от компонета (top, left, down, right)
+                    gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
+                    gridBagConstraints.ipady = 0;
+                    pp.setMinimumSize(new Dimension(163,100));
+                    pp.setPreferredSize(new Dimension(490,300));
+                    frame.add(pp, gridBagConstraints);*/
 
                 }
 
