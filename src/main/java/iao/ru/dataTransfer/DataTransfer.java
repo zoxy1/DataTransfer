@@ -9,9 +9,12 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.crypto.Data;
 
 /**
  * Created by Zoxy1 on 20.07.17.
@@ -320,13 +323,14 @@ public class DataTransfer {
     public class SendPictureButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-          BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_BYTE_GRAY);
-            Graphics2D graphics = scaleImage.createGraphics();
-            graphics.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
-            graphics.dispose();
-            int rgba = scaleImage.getRGB(0,0);
-            Color color = new Color(rgba, true);
-            int r = color.getRed();
+          if(bufferedImage !=null) {
+              BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_BYTE_GRAY);
+              Graphics2D graphics = scaleImage.createGraphics();
+              graphics.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
+              graphics.dispose();
+              int rgba = scaleImage.getRGB(0, 0);
+              Color color = new Color(rgba, true);
+              int r = color.getRed();
 
                /* int [] rgbMass = bufferedImageBMP.getRGB(0,0,imagePanel.getWidth(),imagePanel.getWidth(),null, 0, imagePanel.getWidth());
                 int rgba = rgbMass[0];
@@ -336,13 +340,19 @@ public class DataTransfer {
                 int b = color.getBlue();
 
                 int length = rgbMass.length;*/
-
-               try {
-                    ImageIO.write(scaleImage, "bmp", new File("c:\\testfoto.bmp"));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                comPortExeption.setText("Send picture...");
+              Date currentData = new Date();
+              SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+              System.out.println(format1.format(currentData));
+              String path = "c:\\picture_" + format1.format(currentData) + ".bmp";
+              try {
+                  ImageIO.write(scaleImage, "bmp", new File(path));
+              } catch (IOException e1) {
+                  e1.printStackTrace();
+              }
+              comPortExeption.setText("Send picture...");
+          }else{
+              comPortExeption.setText("Picture don`t selected");
+          }
         }
     }
 }
