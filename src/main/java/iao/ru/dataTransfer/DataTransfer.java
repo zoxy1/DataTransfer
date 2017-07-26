@@ -315,17 +315,17 @@ public class DataTransfer {
 
                 file = fileopen.getSelectedFile();
 
-                frame.remove(imagePanel);
-                ImagePanel imagePanelNew = new ImagePanel();
-
+                //frame.remove(imagePanel);
+                //ImagePanel imagePanelNew = new ImagePanel();
+                //imagePanel.removeImage();
                 try {
                     bufferedImage = ImageIO.read(file);
-                    imagePanelNew.setImage(bufferedImage);
+                    imagePanel.setImage(bufferedImage);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
 
-                GridBagConstraints gridBagConstraints = new GridBagConstraints();
+               /* GridBagConstraints gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
                 gridBagConstraints.gridy = 1; // расположение элемента по y
                 gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
@@ -339,7 +339,11 @@ public class DataTransfer {
                 gridBagConstraints.ipady = 0;
 
                 imagePanel = imagePanelNew;
-                frame.add(imagePanelNew, gridBagConstraints);
+                frame.add(imagePanelNew, gridBagConstraints);*/
+                //frame.remove(imagePanel);
+                imagePanel.revalidate();
+                //frame.add(imagePanel);
+                frame.revalidate();
                 pictureLabel.setText(file.getAbsolutePath() + " (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
                 comPortExeption.setText("File " + file.getName() + " is opened");
 
