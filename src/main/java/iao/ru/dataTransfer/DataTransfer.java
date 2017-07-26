@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +40,8 @@ public class DataTransfer {
     private ImagePanel imagePanel = new ImagePanel();
     private JFrame frame = new JFrame("Data Transfer");
     private BufferedImage bufferedImage;
+    private JProgressBar progressBar = new JProgressBar();
+    private JPanel progressBarPanel = new JPanel();
 
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -156,17 +160,15 @@ public class DataTransfer {
                 frame.add(sendPictureButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
                 sendPictureButton.addActionListener(new SendPictureButtonActionListener());
 
-                JProgressBar progressBar = new JProgressBar();
                 progressBar.setMinimum(0);
                 progressBar.setMaximum(100);
-                progressBar.setValue(50);
                 progressBar.setStringPainted(true);
                 progressBar.setLayout(new GridBagLayout());
                 progressBar.setMinimumSize(new Dimension(100, 20));
                 progressBar.setPreferredSize(new Dimension(300, 20));
-
                 progressBar.setForeground(Color.green);
-                frame.add(progressBar, new GridBagConstraints(1, 2, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
+                progressBarPanel.add(progressBar);
+                frame.add(progressBarPanel, new GridBagConstraints(1, 2, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
 
                 sendText.setLayout(new GridBagLayout());
                 sendText.addActionListener(new SendTextButtonActionListener());
@@ -383,7 +385,7 @@ public class DataTransfer {
                     comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
             } else {
-                comPortExeption.setText("Picture don`t selected");
+                comPortExeption.setText("File picture don`t selected");
             }
         }
     }
@@ -391,6 +393,38 @@ public class DataTransfer {
     public class SendFileButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            if(fileText != null) {
+                FileReader reader = null;
+                try {
+                    reader = new FileReader(fileText);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                int charSymbol;
+                int countChar64 = 0;
+                long countChar = 0;
+                long sizeFile = fileText.length();
+                System.out.print(sizeFile);
+                try {
+                    while((charSymbol=reader.read())!=-1){
+                        if(countChar64 > 63){
+                            countChar64 = 0;
+                            Thread.sleep(1000);
+                        }
+                        countChar64++;
+                        progressBar.setValue((int)((countChar*100)/sizeFile));
+                        //progressBar.revalidate();
+                        System.out.println((int) ((countChar*100)/sizeFile));
+                        countChar++;
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }else{
+                comPortExeption.setText("File text don`t selected");
+            }
 
         }
     }
