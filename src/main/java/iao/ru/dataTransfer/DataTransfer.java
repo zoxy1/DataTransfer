@@ -315,17 +315,16 @@ public class DataTransfer {
 
                 file = fileopen.getSelectedFile();
 
-                //frame.remove(imagePanel);
-                //ImagePanel imagePanelNew = new ImagePanel();
-                //imagePanel.removeImage();
+                frame.remove(imagePanel);
+                ImagePanel imagePanelNew = new ImagePanel();
                 try {
                     bufferedImage = ImageIO.read(file);
-                    imagePanel.setImage(bufferedImage);
+                    imagePanelNew.setImage(bufferedImage);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
 
-               /* GridBagConstraints gridBagConstraints = new GridBagConstraints();
+                GridBagConstraints gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
                 gridBagConstraints.gridy = 1; // расположение элемента по y
                 gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
@@ -337,13 +336,9 @@ public class DataTransfer {
                 gridBagConstraints.insets = new Insets(1, 1, 1, 1); // отступы от компонета (top, left, down, right)
                 gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
                 gridBagConstraints.ipady = 0;
+                frame.add(imagePanelNew, gridBagConstraints);
 
                 imagePanel = imagePanelNew;
-                frame.add(imagePanelNew, gridBagConstraints);*/
-                //frame.remove(imagePanel);
-                imagePanel.revalidate();
-                //frame.add(imagePanel);
-                frame.revalidate();
                 pictureLabel.setText(file.getAbsolutePath() + " (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
                 comPortExeption.setText("File " + file.getName() + " is opened");
 
