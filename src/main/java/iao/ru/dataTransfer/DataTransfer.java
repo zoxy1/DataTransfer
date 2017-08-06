@@ -34,7 +34,7 @@ public class DataTransfer extends JFrame {
     private JButton sendText = new JButton("Send text");
     private JButton sendFile = new JButton("Send file");
     private JLabel comPortExeption = new JLabel();
-    SerialPort serialPortOpen = new SerialPort("COM1");
+    private SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
     private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
     private JLabel pictureLabel = new JLabel("Please open the picture");
@@ -409,7 +409,7 @@ public class DataTransfer extends JFrame {
             if (fileText != null) {
                 if (serialPortOpen.isOpened()) {
                     UICallback ui = new UICallbackImpl();
-                    loader = new SwingWorkerLoader(ui, fileText);
+                    loader = new SwingWorkerLoader(ui, fileText, serialPortOpen);
                     loader.execute();
                     loader.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {

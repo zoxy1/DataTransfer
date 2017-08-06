@@ -1,5 +1,6 @@
 package iao.ru.dataTransfer;
 
+import jssc.SerialPort;
 import sun.security.util.SecurityConstants;
 
 import javax.swing.*;
@@ -19,25 +20,23 @@ import java.util.List;
 public class SwingWorkerLoader extends SwingWorker<String, Integer> {
 
 
-    File fileText;
+    private File fileText;
     /**
      * UI callback
      */
     private UICallback ui;
 
+    private SerialPort serialPortOpen;
     /**
      * Creates data loader.
      *
      * @param ui     UI callback to use when publishing data and manipulating UI
      * //@param reader data source
      */
-    public SwingWorkerLoader(UICallback ui, File fileText) {
+    public SwingWorkerLoader(UICallback ui, File fileText, SerialPort serialPortOpen) {
         this.ui = ui;
         this.fileText = fileText;
-        //this.reader = reader;
-        // this operation is safe because
-        // 1. SwingWorkerLoader is created in EDT
-        // 2. Anyway - UICallback is proxied by EDTInvocationHandler  
+        this.serialPortOpen = serialPortOpen;
         this.ui.startLoading();
     }
 
@@ -58,19 +57,22 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
                 e1.printStackTrace();
             }
             int countChar64 = 0;
+            int byteRead;
             long countChar = 0;
             long sizeFile = fileText.length();
             System.out.print(sizeFile);
             try {
-                while((reader.read())!=-1){
+                while((byteRead = reader.read())!=-1){
                     if(countChar64 > 63){
                         countChar64 = 0;
                         Thread.sleep(1000);
                     }
+                    serialPortOpen.writeByte((byte)byteRead);
+                    System.out.print((char)byteRead);
                     countChar64++;
                     //publish((int)((countChar*100)/sizeFile));
                     setProgress((int)((countChar*100)/sizeFile));
-                    System.out.println((int) ((countChar*100)/sizeFile));
+                    //System.out.println((int) ((countChar*100)/sizeFile));
                     countChar++;
                 }
             } catch (IOException e1) {
