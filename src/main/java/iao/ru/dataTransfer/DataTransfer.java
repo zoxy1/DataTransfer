@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  * Created by Zoxy1 on 20.07.17.
  */
-public class DataTransfer {
+public class DataTransfer extends JFrame {
     private static final long serialVersion = 2347162171234712347L;
     private JTextField fieldInText = new JTextField(10);
     private JLabel pathText = new JLabel();
@@ -42,7 +43,8 @@ public class DataTransfer {
     private BufferedImage bufferedImage;
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressBarPanel = new JPanel();
-
+    private Loader loader = null;
+    private JButton cancel = new JButton("Cancel");
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -168,6 +170,7 @@ public class DataTransfer {
                 progressBar.setPreferredSize(new Dimension(300, 20));
                 progressBar.setForeground(Color.green);
                 progressBarPanel.add(progressBar);
+                progressBarPanel.setVisible(false);
                 frame.add(progressBarPanel, new GridBagConstraints(1, 2, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
 
                 sendText.setLayout(new GridBagLayout());
@@ -180,7 +183,6 @@ public class DataTransfer {
                 comPortExeption.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-                //comPortExeption
 
                 sendFile.setLayout(new GridBagLayout());
                 sendFile.addActionListener(new SendFileButtonActionListener());
@@ -198,7 +200,16 @@ public class DataTransfer {
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 
-                frame.add(comPortExeption, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
+                frame.add(cancel, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
+
+                cancel.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        loader.cancel();
+                    }
+                });
+                frame.add(comPortExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
+
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -392,40 +403,12 @@ public class DataTransfer {
     public class SendFileButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            if(fileText != null) {
-                FileReader reader = null;
-                try {
-                    reader = new FileReader(fileText);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                }
-                int charSymbol;
-                int countChar64 = 0;
-                long countChar = 0;
-                long sizeFile = fileText.length();
-                System.out.print(sizeFile);
-                try {
-                    while((charSymbol=reader.read())!=-1){
-                        if(countChar64 > 63){
-                            countChar64 = 0;
-                            Thread.sleep(1000);
-                        }
-                        countChar64++;
-                        progressBar.setValue((int)((countChar*100)/sizeFile));
-                        //progressBar.revalidate();
-                        System.out.println((int) ((countChar*100)/sizeFile));
-                        countChar++;
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }else{
-                comPortExeption.setText("File text don`t selected");
-            }
 
-        }
+            UICallback ui = new UICallbackImpl();
+            loader = new SwingWorkerLoader(ui, fileText);
+            loader.execute();
+                        }
+
     }
 
     public class OpenTextActionListener implements ActionListener {
@@ -444,6 +427,71 @@ public class DataTransfer {
                 fileText = fileopen.getSelectedFile();
                 pathText.setText("Selected file: " + fileText.getPath());
             }
+        }
+    }
+
+    /**
+     * UI callback implementation
+     */
+    private class UICallbackImpl implements UICallback {
+        /**
+         * Appends the text passes to test area
+         *
+         * @param text text to append
+         */
+        @Override
+        public void appendText(final String text) {
+            //taText.append(text);
+        }
+
+        /**
+         * Sets the text passed to text area
+         *
+         * @param text text to set
+         */
+        @Override
+        public void setText(final String text) {
+            comPortExeption.setText(text);
+        }
+
+        /**
+         * Sets loading progress
+         *
+         * @param progressPercent progress value to set
+         */
+
+        @Override
+        public void setProgress(final int progressPercent) {
+            progressBar.setValue(progressPercent);
+        }
+
+        /**
+         * Performs visual operations on loading start - clears the text and shows popup with the progress bar .
+         */
+        @Override
+        public void startLoading() {
+            comPortExeption.setText("Start transfer text");
+            progressBar.setValue(0);
+            progressBarPanel.setVisible(true);
+        }
+
+        /**
+         * Performs visual operations on loading stop - hides progress bar
+         */
+        @Override
+        public void stopLoading() {
+            progressBarPanel.setVisible(false);
+            loader = null;
+        }
+
+        /**
+         * Shows error message to user
+         *
+         * @param message message to display
+         */
+        @Override
+        public void showError(final String message) {
+            JOptionPane.showMessageDialog(DataTransfer.this, message, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
