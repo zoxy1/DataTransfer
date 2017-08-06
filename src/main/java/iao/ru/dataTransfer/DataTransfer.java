@@ -9,6 +9,8 @@ import jssc.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -43,8 +45,9 @@ public class DataTransfer extends JFrame {
     private BufferedImage bufferedImage;
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressBarPanel = new JPanel();
-    private Loader loader = null;
+    private SwingWorkerLoader loader = null;
     private JButton cancel = new JButton("Cancel");
+
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -365,13 +368,13 @@ public class DataTransfer extends JFrame {
             if (bufferedImage != null) {
                 if (serialPortOpen.isOpened()) {
 
-                BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_BYTE_GRAY);
-                Graphics2D graphics = scaleImage.createGraphics();
-                graphics.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
-                graphics.dispose();
-                int rgba = scaleImage.getRGB(0, 0);
-                Color color = new Color(rgba, true);
-                int r = color.getRed();
+                    BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_BYTE_GRAY);
+                    Graphics2D graphics = scaleImage.createGraphics();
+                    graphics.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
+                    graphics.dispose();
+                    int rgba = scaleImage.getRGB(0, 0);
+                    Color color = new Color(rgba, true);
+                    int r = color.getRed();
 
                /* int [] rgbMass = bufferedImageBMP.getRGB(0,0,imagePanel.getWidth(),imagePanel.getWidth(),null, 0, imagePanel.getWidth());
                 int rgba = rgbMass[0];
@@ -381,16 +384,16 @@ public class DataTransfer extends JFrame {
                 int b = color.getBlue();
 
                 int length = rgbMass.length;*/
-                Date currentData = new Date();
-                SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
-                System.out.println(format1.format(currentData));
-                String path = "c:\\picture_" + format1.format(currentData) + ".bmp";
-                try {
-                    ImageIO.write(scaleImage, "bmp", new File(path));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                comPortExeption.setText("Send picture...");
+                    Date currentData = new Date();
+                    SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+                    System.out.println(format1.format(currentData));
+                    String path = "c:\\picture_" + format1.format(currentData) + ".bmp";
+                    try {
+                        ImageIO.write(scaleImage, "bmp", new File(path));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    comPortExeption.setText("Send picture...");
                 } else {
                     comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
@@ -403,12 +406,26 @@ public class DataTransfer extends JFrame {
     public class SendFileButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-
-            UICallback ui = new UICallbackImpl();
-            loader = new SwingWorkerLoader(ui, fileText);
-            loader.execute();
+            if (fileText != null) {
+                if (serialPortOpen.isOpened()) {
+                    UICallback ui = new UICallbackImpl();
+                    loader = new SwingWorkerLoader(ui, fileText);
+                    loader.execute();
+                    loader.addPropertyChangeListener(new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            if ("progress".equals(evt.getPropertyName())) {
+                                progressBar.setValue((Integer) evt.getNewValue());
+                            }
                         }
+                    });
 
+                } else {
+                    comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
+                }
+            } else {
+                comPortExeption.setText("File text don`t selected");
+            }
+        }
     }
 
     public class OpenTextActionListener implements ActionListener {
@@ -434,21 +451,7 @@ public class DataTransfer extends JFrame {
      * UI callback implementation
      */
     private class UICallbackImpl implements UICallback {
-        /**
-         * Appends the text passes to test area
-         *
-         * @param text text to append
-         */
-        @Override
-        public void appendText(final String text) {
-            //taText.append(text);
-        }
 
-        /**
-         * Sets the text passed to text area
-         *
-         * @param text text to set
-         */
         @Override
         public void setText(final String text) {
             comPortExeption.setText(text);
@@ -470,7 +473,7 @@ public class DataTransfer extends JFrame {
          */
         @Override
         public void startLoading() {
-            comPortExeption.setText("Start transfer text");
+            comPortExeption.setText("Start transfer file text...");
             progressBar.setValue(0);
             progressBarPanel.setVisible(true);
         }
@@ -494,6 +497,8 @@ public class DataTransfer extends JFrame {
             JOptionPane.showMessageDialog(DataTransfer.this, message, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
 }
 
 

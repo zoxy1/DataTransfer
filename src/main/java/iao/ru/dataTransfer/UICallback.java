@@ -10,19 +10,6 @@ package iao.ru.dataTransfer;
  */
 public interface UICallback {
 
-    /**
-     * Appends text to the main text area. This method can be called from outside EDT.
-     *
-     * @param text text to append
-     */
-    //@RequiresEDT
-    void appendText(String text);
-
-    /**
-     * Sets text to the main text area, replacing existing context. This method can be called from outside EDT.
-     *
-     * @param text text to set
-     */
     //@RequiresEDT
     void setText(String text);
 

@@ -1,5 +1,7 @@
 package iao.ru.dataTransfer;
 
+import sun.security.util.SecurityConstants;
+
 import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +16,7 @@ import java.util.List;
  * @version $Id: SwingWorkerLoader.java 416 2010-07-26 14:22:39Z skipy_ru $
  * @since 12.07.2010
  */
-public class SwingWorkerLoader extends SwingWorker<String, Integer> implements Loader {
+public class SwingWorkerLoader extends SwingWorker<String, Integer> {
 
 
     File fileText;
@@ -48,7 +50,7 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> implements L
      */
     @Override
     protected String doInBackground() throws Exception {
-        if(fileText != null) {
+
             FileReader reader = null;
             try {
                 reader = new FileReader(fileText);
@@ -76,9 +78,6 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> implements L
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
-        }else{
-            //ui.setText("File text don`t selected");
-        }
         return "";
     }
 
@@ -100,9 +99,8 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> implements L
     /**
      * Cancels execution
      */
-    @Override
     public void cancel() {
-        cancel(true);
+            cancel(true);
     }
 
     /**
