@@ -165,17 +165,6 @@ public class DataTransfer extends JFrame {
                 frame.add(sendPictureButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
                 sendPictureButton.addActionListener(new SendPictureButtonActionListener());
 
-                progressBar.setMinimum(0);
-                progressBar.setMaximum(100);
-                progressBar.setStringPainted(true);
-                progressBar.setLayout(new GridBagLayout());
-                progressBar.setMinimumSize(new Dimension(100, 20));
-                progressBar.setPreferredSize(new Dimension(300, 20));
-                progressBar.setForeground(Color.green);
-                progressBarPanel.add(progressBar);
-                progressBarPanel.setVisible(false);
-                frame.add(progressBarPanel, new GridBagConstraints(1, 2, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
-
                 sendText.setLayout(new GridBagLayout());
                 sendText.addActionListener(new SendTextButtonActionListener());
                 frame.add(sendText, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
@@ -211,6 +200,18 @@ public class DataTransfer extends JFrame {
                         loader.cancel();
                     }
                 });
+
+                progressBar.setMinimum(0);
+                progressBar.setMaximum(100);
+                progressBar.setStringPainted(true);
+                progressBar.setLayout(new GridBagLayout());
+                progressBar.setMinimumSize(new Dimension(100, 20));
+                progressBar.setPreferredSize(new Dimension(370, 20));
+                progressBar.setForeground(Color.green);
+                progressBarPanel.add(progressBar);
+                progressBarPanel.setVisible(true);
+                frame.add(progressBarPanel, new GridBagConstraints(1, 5, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
+
                 frame.add(comPortExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
 
                 frame.pack();
@@ -418,7 +419,6 @@ public class DataTransfer extends JFrame {
                             }
                         }
                     });
-
                 } else {
                     comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
