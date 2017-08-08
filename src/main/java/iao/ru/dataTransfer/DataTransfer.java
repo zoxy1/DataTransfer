@@ -36,8 +36,8 @@ public class DataTransfer extends JFrame {
     private SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
     private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
-    private JLabel pictureLabel = new JLabel("Please open the picture");
-    private File file;
+    private JLabel pictureLabel = new JLabel("");
+    private File filePicture;
     private File fileText;
     private ImagePanel imagePanel = new ImagePanel();
     private JFrame frame = new JFrame("Data Transfer");
@@ -127,7 +127,7 @@ public class DataTransfer extends JFrame {
                     comPortItems.add(new JMenuItem(portNames[i]));
                     comPortItems.get(i).setFont(font);
                     portMenu.add(comPortItems.get(i));
-                    comPortItems.get(i).addActionListener(new ActionListenerSelectComPort(portNames[i]));
+                    comPortItems.get(i).addActionListener(new SelectComPortActionListener(portNames[i]));
                 }
 
                 if (serialPortOpen.isOpened()) {
@@ -186,7 +186,7 @@ public class DataTransfer extends JFrame {
 
                 sendPictureButton.setLayout(new GridBagLayout());
                 frame.add(sendPictureButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
-                sendPictureButton.addActionListener(new SendPictureButtonActionListener());
+                sendPictureButton.addActionListener(new SendFilePictureButtonActionListener());
 
                 pathPicture.setLayout(new GridBagLayout());
                 pathPicture.setBorder(BorderFactory.createCompoundBorder(
@@ -207,7 +207,7 @@ public class DataTransfer extends JFrame {
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 
                 sendFile.setLayout(new GridBagLayout());
-                sendFile.addActionListener(new SendFileButtonActionListener());
+                sendFile.addActionListener(new SendFileTextButtonActionListener());
                 frame.add(sendFile, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 
                 pathText.setLayout(new GridBagLayout());
@@ -238,7 +238,7 @@ public class DataTransfer extends JFrame {
                 progressBar.setPreferredSize(new Dimension(370, 20));
                 progressBar.setForeground(Color.green);
                 progressBarPanel.add(progressBar);
-                progressBarPanel.setVisible(true);
+                progressBarPanel.setVisible(false);
                 frame.add(progressBarPanel, new GridBagConstraints(1, 5, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
 
                 frame.add(lineTextExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
@@ -285,6 +285,7 @@ public class DataTransfer extends JFrame {
                         serialPortOpen.writeByte(bytes[i]);
                         countByte32++;
                     }
+                    lineTextExeption.setText("Text is transmitted");
                     } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 } catch (SerialPortException e1) {
@@ -297,11 +298,11 @@ public class DataTransfer extends JFrame {
         }
     }
 
-    public class ActionListenerSelectComPort implements ActionListener {
+    public class SelectComPortActionListener implements ActionListener {
 
         private String portName;
 
-        public ActionListenerSelectComPort(String portName) {
+        public SelectComPortActionListener(String portName) {
             this.portName = portName;
         }
 
@@ -366,12 +367,12 @@ public class DataTransfer extends JFrame {
 
             if (ret == JFileChooser.APPROVE_OPTION) {
 
-                file = fileopen.getSelectedFile();
+                filePicture = fileopen.getSelectedFile();
 
                 frame.remove(imagePanel);
                 ImagePanel imagePanelNew = new ImagePanel();
                 try {
-                    bufferedImage = ImageIO.read(file);
+                    bufferedImage = ImageIO.read(filePicture);
                     imagePanelNew.setImage(bufferedImage);
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -393,8 +394,8 @@ public class DataTransfer extends JFrame {
 
                 imagePanel = imagePanelNew;
                 pictureLabel.setText(" (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
-                pathPicture.setText(file.getAbsolutePath());
-                lineTextExeption.setText("File " + file.getName() + " is opened");
+                pathPicture.setText(filePicture.getAbsolutePath());
+                lineTextExeption.setText("File " + filePicture.getName() + " is opened");
 
             } else {
                 lineTextExeption.setText("File don`t selected");
@@ -402,7 +403,7 @@ public class DataTransfer extends JFrame {
         }
     }
 
-    public class SendPictureButtonActionListener implements ActionListener {
+    public class SendFilePictureButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             if (bufferedImage != null) {
@@ -429,7 +430,7 @@ public class DataTransfer extends JFrame {
                     System.out.println(format1.format(currentData));
                     String path = "picture_" + format1.format(currentData) + ".bmp";
                     try {
-                        File fileWrite = new File("Pictures transferred\\picture_" + format1.format(currentData) + ".bmp");
+                        File fileWrite = new File("Pictures is transmitted\\picture_" + format1.format(currentData) + ".bmp");
                         fileWrite.mkdirs();
                         ImageIO.write(scaleImage, "bmp", fileWrite);
                     } catch (IOException e1) {
@@ -445,7 +446,7 @@ public class DataTransfer extends JFrame {
         }
     }
 
-    public class SendFileButtonActionListener implements ActionListener {
+    public class SendFileTextButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             if (fileText != null) {
@@ -484,6 +485,7 @@ public class DataTransfer extends JFrame {
 
                 fileText = fileopen.getSelectedFile();
                 pathText.setText(fileText.getPath());
+                lineTextExeption.setText("File " + fileText.getName() + "is opened");
             }
         }
     }
@@ -514,7 +516,7 @@ public class DataTransfer extends JFrame {
          */
         @Override
         public void startLoading() {
-            lineTextExeption.setText("Start transfer file text...");
+            lineTextExeption.setText("Send file...");
             progressBar.setValue(0);
             progressBarPanel.setVisible(true);
         }

@@ -13,15 +13,8 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
-/**
- * Background data loader based on {@link SwingWorker}.
- *
- * @author Eugene Matyushkin aka Skipy
- * @version $Id: SwingWorkerLoader.java 416 2010-07-26 14:22:39Z skipy_ru $
- * @since 12.07.2010
- */
-public class SwingWorkerLoader extends SwingWorker<String, Integer> {
 
+public class SwingWorkerLoader extends SwingWorker<String, Integer> {
 
     private File fileText;
     /**
@@ -103,6 +96,6 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
     @Override
     protected void done() {
         ui.stopLoading();
-        ui.setText("File transferred");
+        ui.setText("File transmitted");
     }
 }
