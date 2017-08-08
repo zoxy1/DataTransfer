@@ -4,12 +4,15 @@ import jssc.SerialPort;
 import sun.security.util.SecurityConstants;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
 import java.util.List;
-
+import java.nio.charset.StandardCharsets;
 /**
  * Background data loader based on {@link SwingWorker}.
  *
@@ -50,16 +53,104 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
     @Override
     protected String doInBackground() throws Exception {
 
-            FileReader reader = null;
-            try {
+        //FileReader reader = null;
+        FileInputStream fis = new FileInputStream(fileText);
+        ArrayList<Byte> arrayByte = new ArrayList<Byte>();
+        int byteRead;
+        while ((byteRead = fis.read()) != -1) {
+            arrayByte.add((byte)byteRead);
+        }
+        long countChar32 = 0;
+        long countChar = 0;
+        long sizeFile = fileText.length();
+        for (byte byteTransfer : arrayByte) {
+            if (countChar32 > 31) {
+                countChar32 = 0;
+                Thread.sleep(100);
+            }
+            serialPortOpen.writeByte(byteTransfer);
+            System.out.println(byteTransfer);
+            countChar32++;
+            //publish((int)((countChar*100)/sizeFile));
+            setProgress((int) ((countChar * 100) / sizeFile));
+            countChar++;
+        }
+
+
+
+
+
+
+
+
+        //InputStreamReader isr = new InputStreamReader(fis, "Windows-1251");
+        //System.out.println(isr.getEncoding());
+
+        //String stringBuffer = new String();
+        //int countChar64 = 0;
+        //int byteRead;
+        //long countChar = 0;
+        //while((byteRead = isr.read())!=-1){
+            //stringBuffer=stringBuffer + (char)byteRead;
+            //System.out.println((char)byteRead);
+            /*if(countChar64 > 31){
+                countChar64 = 0;
+                Thread.sleep(100);
+            }
+            serialPortOpen.writeInt(byteRead);
+            System.out.println(byteRead);
+            countChar64++;
+            //publish((int)((countChar*100)/sizeFile));
+            setProgress((int)((countChar*100)/sizeFile));
+            countChar++;*/
+        //}
+
+        //System.out.println(stringBuffer);
+
+
+       // Charset cset = Charset.forName("Windows-1251");
+        //ByteBuffer buf = cset.encode(stringBuffer);
+        //byte[] b = buf.array();
+        //String str = new String(b);
+        //System.out.println(str);
+        //String stringDecode = new String(stringBuffer.getBytes("Windows-1251"),"UTF-8");
+        //System.out.println(stringDecode);
+        //BufferedReader br = new BufferedReader(isr);
+        /*String line;
+        StringBuffer stringBuffer = new StringBuffer();
+        while((line = br.readLine()) != null){
+            System.out.println(line);
+            stringBuffer.append(line);
+            //System.out.println(new String(line.getBytes("UTF-16"),"Windows-1251"));
+        }
+        System.out.println(stringBuffer.toString());
+        br.close();*/
+
+
+
+        /*while((byteRead = isr.read())!=-1){
+            if(countChar64 > 63){
+                countChar64 = 0;
+                Thread.sleep(100);
+            }
+            serialPortOpen.writeInt(byteRead);
+            System.out.println(byteRead);
+            countChar64++;
+            //publish((int)((countChar*100)/sizeFile));
+            setProgress((int)((countChar*100)/sizeFile));
+            countChar++;
+        }*/
+
+
+
+
+
+       /* try {
                 reader = new FileReader(fileText);
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             }
-            int countChar64 = 0;
-            int byteRead;
-            long countChar = 0;
-            long sizeFile = fileText.length();
+
             System.out.print(sizeFile);
             try {
                 while((byteRead = reader.read())!=-1){
@@ -67,19 +158,18 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
                         countChar64 = 0;
                         Thread.sleep(1000);
                     }
-                    serialPortOpen.writeByte((byte)byteRead);
-                    System.out.print((char)byteRead);
+                    serialPortOpen.writeInt(byteRead);
+                    System.out.println(byteRead);
                     countChar64++;
                     //publish((int)((countChar*100)/sizeFile));
                     setProgress((int)((countChar*100)/sizeFile));
-                    //System.out.println((int) ((countChar*100)/sizeFile));
                     countChar++;
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
-            }
+            }*/
         return "";
     }
 

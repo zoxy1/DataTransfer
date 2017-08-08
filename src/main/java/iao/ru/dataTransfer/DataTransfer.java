@@ -12,10 +12,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Proxy;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,10 +27,10 @@ public class DataTransfer extends JFrame {
     private JTextField fieldInText = new JTextField(10);
     private JLabel pathText = new JLabel();
     static String comPortName;
-    private JButton sendPictureButton = new JButton("Send picture");
+    private JButton sendPictureButton = new JButton("Send picture file");
     private JButton sendText = new JButton("Send text");
-    private JButton sendFile = new JButton("Send file");
-    private JLabel comPortExeption = new JLabel();
+    private JButton sendFile = new JButton("Send text file");
+    private JLabel lineTextExeption = new JLabel();
     private SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
     private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
@@ -47,6 +44,7 @@ public class DataTransfer extends JFrame {
     private JPanel progressBarPanel = new JPanel();
     private SwingWorkerLoader loader = null;
     private JButton cancel = new JButton("Cancel");
+    private JLabel pathPicture = new JLabel();
 
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -130,9 +128,32 @@ public class DataTransfer extends JFrame {
                     comPortItems.get(i).addActionListener(new ActionListenerSelectComPort(portNames[i]));
                 }
 
+                if (serialPortOpen.isOpened()) {
+                    try {
+                        serialPortOpen.closePort();
+                    } catch (SerialPortException e1) {
+                        e1.printStackTrace();
+                        lineTextExeption.setText(e1.getExceptionType());
+                    }
+                }
+                try {
+                    //Открываем порт
+                    serialPortOpen.openPort();
+                    //Выставляем параметры
+                    serialPortOpen.setParams(portSpeed,
+                            SerialPort.DATABITS_8,
+                            SerialPort.STOPBITS_1,
+                            SerialPort.PARITY_NONE);
+                    if (serialPortOpen.isOpened()) {
+                        lineTextExeption.setText(serialPortOpen.getPortName() + " is open");
+                    }
+                } catch (SerialPortException ex) {
+                    System.out.println(ex);
+                    lineTextExeption.setText(ex.getExceptionType());
+                }
                 menuBar.add(settingsMenu);
                 frame.setJMenuBar(menuBar);
-                frame.setPreferredSize(new Dimension(500, 500));
+                frame.setPreferredSize(new Dimension(600, 500));
                 frame.setLayout(new GridBagLayout());
                 JPanel filePathPanel = new JPanel();
                 filePathPanel.add(pictureLabel);
@@ -165,14 +186,21 @@ public class DataTransfer extends JFrame {
                 frame.add(sendPictureButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
                 sendPictureButton.addActionListener(new SendPictureButtonActionListener());
 
+                pathPicture.setLayout(new GridBagLayout());
+                pathPicture.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.gray, 2),
+                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+                pathPicture.setText("Please open the file picture");
+                frame.add(pathPicture, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
+
                 sendText.setLayout(new GridBagLayout());
                 sendText.addActionListener(new SendTextButtonActionListener());
                 frame.add(sendText, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 
                 fieldInText.setLayout(new GridBagLayout());
                 frame.add(fieldInText, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
-                comPortExeption.setText("Select COM port");
-                comPortExeption.setBorder(BorderFactory.createCompoundBorder(
+                lineTextExeption.setText("Select COM port");
+                lineTextExeption.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 
@@ -187,13 +215,12 @@ public class DataTransfer extends JFrame {
                 pathText.setText("Please open the file text");
                 frame.add(pathText, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 
-                comPortExeption.setText("Please select COM port");
-                comPortExeption.setBorder(BorderFactory.createCompoundBorder(
+                lineTextExeption.setText("Please select COM port");
+                lineTextExeption.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 
                 frame.add(cancel, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
-
                 cancel.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -212,13 +239,11 @@ public class DataTransfer extends JFrame {
                 progressBarPanel.setVisible(true);
                 frame.add(progressBarPanel, new GridBagConstraints(1, 5, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
 
-                frame.add(comPortExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
+                frame.add(lineTextExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
 
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-
-
 
     /*private static class PortReader implements SerialPortEventListener {
 
@@ -247,14 +272,14 @@ public class DataTransfer extends JFrame {
             if (serialPortOpen.isOpened()) {
                 try {
                     serialPortOpen.writeString(fieldInText.getText());
+                    System.out.println(fieldInText.getText());
                 } catch (SerialPortException e1) {
                     e1.printStackTrace();
-                    comPortExeption.setText(e1.getExceptionType());
+                    lineTextExeption.setText(e1.getExceptionType());
                 }
             } else {
-                comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
+                lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
             }
-            System.out.println(fieldInText.getText());
         }
     }
 
@@ -273,7 +298,7 @@ public class DataTransfer extends JFrame {
                     serialPortOpen.closePort();
                 } catch (SerialPortException e1) {
                     e1.printStackTrace();
-                    comPortExeption.setText(e1.getExceptionType());
+                    lineTextExeption.setText(e1.getExceptionType());
                 }
             }
 
@@ -288,14 +313,13 @@ public class DataTransfer extends JFrame {
                         SerialPort.STOPBITS_1,
                         SerialPort.PARITY_NONE);
                 if (serialPort.isOpened()) {
-                    comPortExeption.setText(serialPort.getPortName() + " is open");
+                    lineTextExeption.setText(serialPort.getPortName() + " is open");
                     serialPortOpen = serialPort;
                 }
             } catch (SerialPortException ex) {
                 System.out.println(ex);
-                comPortExeption.setText(ex.getExceptionType());
+                lineTextExeption.setText(ex.getExceptionType());
             }
-            System.out.println(comPortName);
         }
 
     }
@@ -308,7 +332,7 @@ public class DataTransfer extends JFrame {
 
                 if (speedItem.isSelected()) {
                     portSpeed = Integer.parseInt(speedItem.getText());
-                    comPortExeption.setText("Select speed = " + portSpeed);
+                    lineTextExeption.setText("Select speed = " + portSpeed);
                 }
             }
         }
@@ -354,11 +378,12 @@ public class DataTransfer extends JFrame {
                 frame.add(imagePanelNew, gridBagConstraints);
 
                 imagePanel = imagePanelNew;
-                pictureLabel.setText(file.getAbsolutePath() + " (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
-                comPortExeption.setText("File " + file.getName() + " is opened");
+                pictureLabel.setText(" (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
+                pathPicture.setText(file.getAbsolutePath());
+                lineTextExeption.setText("File " + file.getName() + " is opened");
 
             } else {
-                comPortExeption.setText("File don`t selected");
+                lineTextExeption.setText("File don`t selected");
             }
         }
     }
@@ -388,18 +413,20 @@ public class DataTransfer extends JFrame {
                     Date currentData = new Date();
                     SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
                     System.out.println(format1.format(currentData));
-                    String path = "c:\\picture_" + format1.format(currentData) + ".bmp";
+                    String path = "picture_" + format1.format(currentData) + ".bmp";
                     try {
-                        ImageIO.write(scaleImage, "bmp", new File(path));
+                        File fileWrite = new File("Pictures transferred\\picture_" + format1.format(currentData) + ".bmp");
+                        fileWrite.mkdirs();
+                        ImageIO.write(scaleImage, "bmp", fileWrite);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-                    comPortExeption.setText("Send picture...");
+                    lineTextExeption.setText("Send picture...");
                 } else {
-                    comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
+                    lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
             } else {
-                comPortExeption.setText("File picture don`t selected");
+                lineTextExeption.setText("File picture don`t selected");
             }
         }
     }
@@ -420,10 +447,10 @@ public class DataTransfer extends JFrame {
                         }
                     });
                 } else {
-                    comPortExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
+                    lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
             } else {
-                comPortExeption.setText("File text don`t selected");
+                lineTextExeption.setText("File text don`t selected");
             }
         }
     }
@@ -442,7 +469,7 @@ public class DataTransfer extends JFrame {
             if (ret == JFileChooser.APPROVE_OPTION) {
 
                 fileText = fileopen.getSelectedFile();
-                pathText.setText("Selected file: " + fileText.getPath());
+                pathText.setText(fileText.getPath());
             }
         }
     }
@@ -454,7 +481,7 @@ public class DataTransfer extends JFrame {
 
         @Override
         public void setText(final String text) {
-            comPortExeption.setText(text);
+            lineTextExeption.setText(text);
         }
 
         /**
@@ -473,7 +500,7 @@ public class DataTransfer extends JFrame {
          */
         @Override
         public void startLoading() {
-            comPortExeption.setText("Start transfer file text...");
+            lineTextExeption.setText("Start transfer file text...");
             progressBar.setValue(0);
             progressBarPanel.setVisible(true);
         }
