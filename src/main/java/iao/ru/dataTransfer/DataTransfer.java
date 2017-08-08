@@ -13,6 +13,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -271,12 +273,24 @@ public class DataTransfer extends JFrame {
         public void actionPerformed(ActionEvent e) {
             if (serialPortOpen.isOpened()) {
                 try {
-                    serialPortOpen.writeString(fieldInText.getText());
-                    System.out.println(fieldInText.getText());
+                    Charset cset = Charset.forName("Windows-1251");
+                    ByteBuffer byteBuffer = cset.encode(fieldInText.getText());
+                    byte[] bytes = byteBuffer.array();
+                    int countByte32=0;
+                    for(int i=0;i<bytes.length;i++) {
+                        if (countByte32 > 31) {
+                            Thread.sleep(100);
+                            countByte32=0;
+                        }
+                        serialPortOpen.writeByte(bytes[i]);
+                        countByte32++;
+                    }
+                    } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 } catch (SerialPortException e1) {
                     e1.printStackTrace();
-                    lineTextExeption.setText(e1.getExceptionType());
                 }
+                System.out.println(fieldInText.getText());
             } else {
                 lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
             }
