@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,11 +29,12 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
     private SerialPort serialPortOpen;
     private ImagePanel imagePanel;
     private final BufferedImage bufferedImage;
+
     /**
      * Creates data loader.
      *
-     * @param ui     UI callback to use when publishing data and manipulating UI
-     * //@param reader data source
+     * @param ui UI callback to use when publishing data and manipulating UI
+     *           //@param reader data source
      */
     public SwingWorkerLoaderPicture(UICallback ui, File file, SerialPort serialPortOpen, ImagePanel imagePanel, BufferedImage bufferedImage) {
         this.bufferedImage = bufferedImage;
@@ -57,12 +60,38 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
         graphics.dispose();
         int height = scaleImage.getHeight();
         int width = scaleImage.getWidth();
-        for(int i=0;i < height;i++ ) {
-            for(int j=0;j < width;j++) {
+        int sleep = 100;
+        long countByte32 = 0;
+        long countByte = 0;
+        long sizePicture = height * width;
+        for (int i = 0; i < height; i++) {
+
+            System.out.print("line ");
+            Charset cset = Charset.forName("Windows-1251");
+            ByteBuffer byteBuffer = cset.encode("line ");
+            byte[] bytes = byteBuffer.array();
+            for (int k = 0; k < bytes.length; k++) {
+                serialPortOpen.writeByte(bytes[k]);
+                if (countByte32 > 31) {
+                    countByte32 = 0;
+                    Thread.sleep(sleep);
+                }
+                countByte32++;
+            }
+
+            for (int j = 0; j < width; j++) {
                 int rgba = scaleImage.getRGB(j, i);
                 Color color = new Color(rgba, true);
                 int r = color.getRed();
-                System.out.print(r+" ");
+                System.out.print(r + " ");
+                if (countByte32 > 31) {
+                    countByte32 = 0;
+                    Thread.sleep(sleep);
+                }
+                serialPortOpen.writeByte((byte) r);
+                countByte32++;
+                setProgress((int) ((countByte * 100) / sizePicture));
+                countByte++;
             }
             System.out.println(" ");
         }
@@ -101,7 +130,6 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
         Date currentData = new Date();
         SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
         System.out.println(format1.format(currentData));
-        String path = "picture_" + format1.format(currentData) + ".bmp";
         try {
             File fileWrite = new File("Pictures is transmitted\\picture_" + format1.format(currentData) + ".bmp");
             fileWrite.mkdirs();
@@ -109,8 +137,6 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        //lineTextExeption.setText("Send picture...");
-
         return "";
     }
 

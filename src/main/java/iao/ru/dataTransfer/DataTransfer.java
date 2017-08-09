@@ -15,9 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -44,7 +42,7 @@ public class DataTransfer extends JFrame {
     private BufferedImage bufferedImage;
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressBarPanel = new JPanel();
-    private SwingWorkerLoaderText loader = null;
+    private SwingWorkerLoaderText loaderText = null;
     private SwingWorkerLoaderPicture loaderPicture = null;
     private JButton cancel = new JButton("Cancel");
     private JLabel pathPicture = new JLabel();
@@ -227,7 +225,12 @@ public class DataTransfer extends JFrame {
                 cancel.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        loader.cancel();
+                        if(loaderText != null) {
+                            loaderText.cancel();
+                        }
+                        if(loaderPicture != null) {
+                            loaderPicture.cancel();
+                        }
                     }
                 });
 
@@ -237,7 +240,7 @@ public class DataTransfer extends JFrame {
                 progressBar.setLayout(new GridBagLayout());
                 progressBar.setMinimumSize(new Dimension(100, 20));
                 progressBar.setPreferredSize(new Dimension(370, 20));
-                progressBar.setForeground(Color.green);
+                progressBar.setForeground(new Color(0,191,32));
                 progressBarPanel.add(progressBar);
                 progressBarPanel.setVisible(false);
                 frame.add(progressBarPanel, new GridBagConstraints(1, 5, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
@@ -263,8 +266,6 @@ public class DataTransfer extends JFrame {
                 }
             }
         }*/
-
-
             }
         });
     }
@@ -434,9 +435,9 @@ public class DataTransfer extends JFrame {
             if (fileText != null) {
                 if (serialPortOpen.isOpened()) {
                     UICallback ui = new UICallbackImpl();
-                    loader = new SwingWorkerLoaderText(ui, fileText, serialPortOpen);
-                    loader.execute();
-                    loader.addPropertyChangeListener(new PropertyChangeListener() {
+                    loaderText = new SwingWorkerLoaderText(ui, fileText, serialPortOpen);
+                    loaderText.execute();
+                    loaderText.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
                             if ("progress".equals(evt.getPropertyName())) {
                                 progressBar.setValue((Integer) evt.getNewValue());
@@ -509,7 +510,7 @@ public class DataTransfer extends JFrame {
         @Override
         public void stopLoading() {
             progressBarPanel.setVisible(false);
-            loader = null;
+            loaderText = null;
         }
 
         /**
