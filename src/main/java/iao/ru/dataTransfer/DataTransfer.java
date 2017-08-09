@@ -44,7 +44,8 @@ public class DataTransfer extends JFrame {
     private BufferedImage bufferedImage;
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressBarPanel = new JPanel();
-    private SwingWorkerLoader loader = null;
+    private SwingWorkerLoaderText loader = null;
+    private SwingWorkerLoaderPicture loaderPicture = null;
     private JButton cancel = new JButton("Cancel");
     private JLabel pathPicture = new JLabel();
 
@@ -408,35 +409,16 @@ public class DataTransfer extends JFrame {
         public void actionPerformed(ActionEvent e) {
             if (bufferedImage != null) {
                 if (serialPortOpen.isOpened()) {
-
-                    BufferedImage scaleImage = new BufferedImage(imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), BufferedImage.TYPE_BYTE_GRAY);
-                    Graphics2D graphics = scaleImage.createGraphics();
-                    graphics.drawImage(bufferedImage, 0, 0, imagePanel.getWidthRealViewImg(), imagePanel.getHeightRealViewImg(), null);
-                    graphics.dispose();
-                    int rgba = scaleImage.getRGB(0, 0);
-                    Color color = new Color(rgba, true);
-                    int r = color.getRed();
-
-               /* int [] rgbMass = bufferedImageBMP.getRGB(0,0,imagePanel.getWidth(),imagePanel.getWidth(),null, 0, imagePanel.getWidth());
-                int rgba = rgbMass[0];
-                Color color = new Color(rgba, true);
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
-
-                int length = rgbMass.length;*/
-                    Date currentData = new Date();
-                    SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
-                    System.out.println(format1.format(currentData));
-                    String path = "picture_" + format1.format(currentData) + ".bmp";
-                    try {
-                        File fileWrite = new File("Pictures is transmitted\\picture_" + format1.format(currentData) + ".bmp");
-                        fileWrite.mkdirs();
-                        ImageIO.write(scaleImage, "bmp", fileWrite);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                    lineTextExeption.setText("Send picture...");
+                    UICallback ui = new UICallbackImpl();
+                    loaderPicture = new SwingWorkerLoaderPicture(ui, filePicture, serialPortOpen, imagePanel, bufferedImage);
+                    loaderPicture.execute();
+                    loaderPicture.addPropertyChangeListener(new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            if ("progress".equals(evt.getPropertyName())) {
+                                progressBar.setValue((Integer) evt.getNewValue());
+                            }
+                        }
+                    });
                 } else {
                     lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
@@ -452,7 +434,7 @@ public class DataTransfer extends JFrame {
             if (fileText != null) {
                 if (serialPortOpen.isOpened()) {
                     UICallback ui = new UICallbackImpl();
-                    loader = new SwingWorkerLoader(ui, fileText, serialPortOpen);
+                    loader = new SwingWorkerLoaderText(ui, fileText, serialPortOpen);
                     loader.execute();
                     loader.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {

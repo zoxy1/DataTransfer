@@ -1,22 +1,15 @@
 package iao.ru.dataTransfer;
 
 import jssc.SerialPort;
-import sun.security.util.SecurityConstants;
 
 import javax.swing.*;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.nio.charset.StandardCharsets;
 
-public class SwingWorkerLoader extends SwingWorker<String, Integer> {
+public class SwingWorkerLoaderText extends SwingWorker<String, Integer> {
 
-    private File fileText;
+    private File file;
     /**
      * UI callback
      */
@@ -29,9 +22,9 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
      * @param ui     UI callback to use when publishing data and manipulating UI
      * //@param reader data source
      */
-    public SwingWorkerLoader(UICallback ui, File fileText, SerialPort serialPortOpen) {
+    public SwingWorkerLoaderText(UICallback ui, File file, SerialPort serialPortOpen) {
         this.ui = ui;
-        this.fileText = fileText;
+        this.file = file;
         this.serialPortOpen = serialPortOpen;
         this.ui.startLoading();
     }
@@ -46,7 +39,7 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
     @Override
     protected String doInBackground() throws Exception {
 
-        FileInputStream fis = new FileInputStream(fileText);
+        FileInputStream fis = new FileInputStream(file);
         ArrayList<Byte> arrayByte = new ArrayList<Byte>();
         int byteRead;
         while ((byteRead = fis.read()) != -1) {
@@ -54,7 +47,7 @@ public class SwingWorkerLoader extends SwingWorker<String, Integer> {
         }
         long countByte32 = 0;
         long countByte = 0;
-        long sizeFile = fileText.length();
+        long sizeFile = file.length();
         for (byte byteTransfer : arrayByte) {
             if (countByte32 > 31) {
                 countByte32 = 0;
