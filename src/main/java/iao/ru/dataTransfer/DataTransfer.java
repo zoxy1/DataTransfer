@@ -31,6 +31,7 @@ public class DataTransfer extends JFrame {
     private JButton sendText = new JButton("Send text");
     private JButton sendFile = new JButton("Send text file");
     private JLabel lineTextExeption = new JLabel();
+    private JLabel developedBy = new JLabel("Developed by Andrey Kudryavtsev");
     private SerialPort serialPortOpen = new SerialPort("COM1");
     private int portSpeed = 115200;
     private ArrayList<JRadioButtonMenuItem> jRadioButtonSpeedMenuItems = new ArrayList<JRadioButtonMenuItem>();
@@ -238,15 +239,17 @@ public class DataTransfer extends JFrame {
                 progressBar.setMaximum(100);
                 progressBar.setStringPainted(true);
                 progressBar.setLayout(new GridBagLayout());
-                progressBar.setMinimumSize(new Dimension(100, 20));
-                progressBar.setPreferredSize(new Dimension(370, 20));
+                //progressBar.setMinimumSize(new Dimension(100, 20));
+                progressBar.setPreferredSize(new Dimension(360, 20));
                 progressBar.setForeground(new Color(0,191,32));
                 progressBarPanel.add(progressBar);
                 progressBarPanel.setVisible(false);
                 frame.add(progressBarPanel, new GridBagConstraints(1, 5, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
 
                 frame.add(lineTextExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
-
+                Font fontdevelopedBy = new Font("Verdana", Font.PLAIN, 8);
+                developedBy.setFont(fontdevelopedBy);
+                frame.add(developedBy, new GridBagConstraints(0, 7, 2, 1, 0.0, 0.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.LINE_END, new Insets(1, 1, 1, 1), 0, 0));
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
