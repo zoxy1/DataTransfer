@@ -373,16 +373,13 @@ public class DataTransfer extends JFrame {
             if (ret == JFileChooser.APPROVE_OPTION) {
 
                 filePicture = fileopen.getSelectedFile();
-
-                frame.remove(imagePanel);
-                ImagePanel imagePanelNew = new ImagePanel();
                 try {
                     bufferedImage = ImageIO.read(filePicture);
-                    imagePanelNew.setImage(bufferedImage);
+                    imagePanel.setImage(bufferedImage);
+                    imagePanel.updateUI();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-
                 GridBagConstraints gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0; // расположение элемента по х
                 gridBagConstraints.gridy = 1; // расположение элемента по y
@@ -395,9 +392,7 @@ public class DataTransfer extends JFrame {
                 gridBagConstraints.insets = new Insets(1, 1, 1, 1); // отступы от компонета (top, left, down, right)
                 gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
                 gridBagConstraints.ipady = 0;
-                frame.add(imagePanelNew, gridBagConstraints);
 
-                imagePanel = imagePanelNew;
                 pictureLabel.setText(" (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
                 pathPicture.setText(filePicture.getAbsolutePath());
                 lineTextExeption.setText("File " + filePicture.getName() + " is opened");
