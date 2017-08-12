@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by Zoxy1 on 09.08.17.
  */
-public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
+public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
 
     private File file;
     /**
@@ -65,8 +65,8 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
         long countByte = 0;
         long sizePicture = height * width;
         for (int i = 0; i < height; i++) {
-
             System.out.print("line ");
+            publish("Line:" + i);
             Charset cset = Charset.forName("Windows-1251");
             ByteBuffer byteBuffer = cset.encode("line ");
             byte[] bytes = byteBuffer.array();
@@ -147,10 +147,10 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, Integer> {
      *               {@link SwingWorker#publish(Object[])}
      */
     @Override
-    protected void process(List<Integer> chunks) {
-        /*for (Integer line : chunks) {
-            ui.appendText(line + "\n");
-        }*/
+    protected void process(List<String> chunks) {
+        for (String line : chunks) {
+            ui.appendText(line);
+        }
 
         ui.setProgress(getProgress());
     }

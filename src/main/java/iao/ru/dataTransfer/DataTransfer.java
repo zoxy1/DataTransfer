@@ -440,13 +440,13 @@ public class DataTransfer extends JFrame {
                     UICallback ui = new UICallbackImpl();
                     loaderText = new SwingWorkerLoaderText(ui, fileText, serialPortOpen);
                     loaderText.execute();
-                    loaderText.addPropertyChangeListener(new PropertyChangeListener() {
+                   /* loaderText.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
                             if ("progress".equals(evt.getPropertyName())) {
                                 progressBar.setValue((Integer) evt.getNewValue());
                             }
                         }
-                    });
+                    });*/
                 } else {
                     lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
@@ -524,6 +524,11 @@ public class DataTransfer extends JFrame {
         @Override
         public void showError(final String message) {
             JOptionPane.showMessageDialog(DataTransfer.this, message, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        @Override
+        public void appendText(String line) {
+            lineTextExeption.setText(line);
         }
     }
 

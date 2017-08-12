@@ -40,4 +40,6 @@ public interface UICallback {
      */
     //@RequiresEDT(RequiresEDTPolicy.SYNC)
     void showError(String message);
+
+    void appendText(String line);
 }
