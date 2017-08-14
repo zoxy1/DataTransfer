@@ -65,10 +65,10 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
         long countByte = 0;
         long sizePicture = height * width;
         for (int i = 0; i < height; i++) {
-            System.out.print("line");
+            System.out.print("line ");
             publish("Line:" + i);
             Charset cset = Charset.forName("Windows-1251");
-            ByteBuffer byteBuffer = cset.encode("line");
+            ByteBuffer byteBuffer = cset.encode("line ");
             byte[] bytes = byteBuffer.array();
             for (int k = 0; k < bytes.length; k++) {
                 serialPortOpen.writeByte(bytes[k]);
