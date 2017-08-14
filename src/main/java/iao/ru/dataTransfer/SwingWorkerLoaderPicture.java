@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
 
-    private File file;
+    //private File file;
     /**
      * UI callback
      */
@@ -36,10 +36,10 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
      * @param ui UI callback to use when publishing data and manipulating UI
      *           //@param reader data source
      */
-    public SwingWorkerLoaderPicture(UICallback ui, File file, SerialPort serialPortOpen, ImagePanel imagePanel, BufferedImage bufferedImage) {
+    public SwingWorkerLoaderPicture(UICallback ui, SerialPort serialPortOpen, ImagePanel imagePanel, BufferedImage bufferedImage) {
         this.bufferedImage = bufferedImage;
         this.imagePanel = imagePanel;
-        this.file = file;
+        //this.file = file;
         this.serialPortOpen = serialPortOpen;
         this.ui = ui;
         this.ui.startLoading();
@@ -95,38 +95,6 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
             }
             System.out.println(" ");
         }
-        //int g = color.getGreen();
-        //int b = color.getBlue();
-        //ArrayList<Byte> arrayByteLine = new ArrayList<Byte>();
-        //ArrayList<ArrayList<Byte>> arrayByte = new ArrayList<ArrayList<Byte>>();
-
-
-       /* int byteRead;
-        scaleImage.
-        while ((byteRead = fis.read()) != -1) {
-            arrayByte.add((byte) byteRead);
-        }
-        long countByte32 = 0;
-        long countByte = 0;
-        long sizeFile = file.length();
-        for (byte byteTransfer : arrayByte) {
-            if (countByte32 > 31) {
-                countByte32 = 0;
-                Thread.sleep(100);
-            }
-            serialPortOpen.writeByte(byteTransfer);
-            countByte32++;
-            setProgress((int) ((countByte * 100) / sizeFile));
-            countByte++;
-        }*/
-               /* int [] rgbMass = bufferedImageBMP.getRGB(0,0,imagePanel.getWidth(),imagePanel.getWidth(),null, 0, imagePanel.getWidth());
-                int rgba = rgbMass[0];
-                Color color = new Color(rgba, true);
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
-
-                int length = rgbMass.length;*/
         Date currentData = new Date();
         SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
         System.out.println(format1.format(currentData));

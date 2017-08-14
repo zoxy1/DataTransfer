@@ -409,7 +409,7 @@ public class DataTransfer extends JFrame {
             if (bufferedImage != null) {
                 if (serialPortOpen.isOpened()) {
                     UICallback ui = new UICallbackImpl();
-                    loaderPicture = new SwingWorkerLoaderPicture(ui, filePicture, serialPortOpen, imagePanel, bufferedImage);
+                    loaderPicture = new SwingWorkerLoaderPicture(ui, serialPortOpen, imagePanel, bufferedImage);
                     loaderPicture.execute();
                     loaderPicture.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
