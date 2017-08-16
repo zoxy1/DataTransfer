@@ -2,6 +2,9 @@ package iao.ru.dataTransfer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.nio.Buffer;
+
 public class ImagePanel extends JPanel {
     private Image image;
     private Integer widthImage;
@@ -9,13 +12,17 @@ public class ImagePanel extends JPanel {
 
     private int widthRealViewImg;
     private int heightRealViewImg;
+    private JLabel pictureLabel;
+
+    public ImagePanel(JLabel pictureLabel) {
+        this.pictureLabel = pictureLabel;
+    }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (image != null) {
             widthImage = image.getWidth(this);
             heightImage = image.getHeight(this);
-            //int imgWidth, imgHeight;
             double contRatio = (double) getWidth() / (double) getHeight();
             double imgRatio =  (double) image.getWidth(this) / (double) image.getHeight(this);
 
@@ -33,7 +40,7 @@ public class ImagePanel extends JPanel {
             //to center
             int x = (int) (((double) getWidth() / 2) - ((double) widthRealViewImg / 2));
             int y = (int) (((double) getHeight()/ 2) - ((double) heightRealViewImg / 2));
-
+            pictureLabel.setText("Original size(width=" + widthImage + ", height=" + heightImage + ") " + "Real transfer size(width=" + widthRealViewImg + ", height=" + heightRealViewImg + ")");
             g.drawImage(image, x, y, widthRealViewImg, heightRealViewImg, this);
         }
 

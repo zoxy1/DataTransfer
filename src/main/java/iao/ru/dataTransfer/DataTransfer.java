@@ -38,9 +38,9 @@ public class DataTransfer extends JFrame {
     private JLabel pictureLabel = new JLabel("");
     private File filePicture;
     private File fileText;
-    private ImagePanel imagePanel = new ImagePanel();
     private JFrame frame = new JFrame("Data Transfer");
     private BufferedImage bufferedImage;
+    private ImagePanel imagePanel = new ImagePanel(pictureLabel);
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressBarPanel = new JPanel();
     private SwingWorkerLoaderText loaderText = null;
@@ -393,7 +393,7 @@ public class DataTransfer extends JFrame {
                 gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
                 gridBagConstraints.ipady = 0;
 
-                pictureLabel.setText(" (width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")");
+                pictureLabel.setText("Original size(width=" + bufferedImage.getWidth() + ", height=" + bufferedImage.getHeight() + ")" + "Real transfer size(width=" + imagePanel.getWidth() + ", height=" + imagePanel.getHeight() + ")");
                 pathPicture.setText(filePicture.getAbsolutePath());
                 lineTextExeption.setText("File " + filePicture.getName() + " is opened");
 
