@@ -240,7 +240,7 @@ public class DataTransfer extends JFrame {
                 progressBar.setStringPainted(true);
                 progressBar.setLayout(new GridBagLayout());
                 //progressBar.setMinimumSize(new Dimension(100, 20));
-                progressBar.setPreferredSize(new Dimension(360, 20));
+                progressBar.setPreferredSize(new Dimension(360, 13));
                 progressBar.setForeground(new Color(0,191,32));
                 progressBarPanel.add(progressBar);
                 progressBarPanel.setVisible(false);
@@ -435,13 +435,13 @@ public class DataTransfer extends JFrame {
                     UICallback ui = new UICallbackImpl();
                     loaderText = new SwingWorkerLoaderText(ui, fileText, serialPortOpen);
                     loaderText.execute();
-                   /* loaderText.addPropertyChangeListener(new PropertyChangeListener() {
+                    loaderText.addPropertyChangeListener(new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
                             if ("progress".equals(evt.getPropertyName())) {
                                 progressBar.setValue((Integer) evt.getNewValue());
                             }
                         }
-                    });*/
+                    });
                 } else {
                     lineTextExeption.setText("Don`t send " + serialPortOpen.getPortName() + " is closed");
                 }
