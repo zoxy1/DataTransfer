@@ -60,7 +60,7 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
         graphics.dispose();
         int height = scaleImage.getHeight();
         int width = scaleImage.getWidth();
-        int sleep = 1;
+        int sleep = 100;
         long countByte32 = 0;
         long countByte = 0;
         long sizePicture = height * width;
