@@ -49,9 +49,9 @@ public class SwingWorkerLoaderText extends SwingWorker<String, Integer> {
         long countByte = 0;
         long sizeFile = file.length();
         for (byte byteTransfer : arrayByte) {
-            if (countByte32 > 31) {
+            if (countByte32 > 63) {
                 countByte32 = 0;
-                Thread.sleep(100);
+                Thread.sleep(35);
             }
             serialPortOpen.writeByte(byteTransfer);
             countByte32++;

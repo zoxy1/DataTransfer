@@ -60,19 +60,19 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
         graphics.dispose();
         int height = scaleImage.getHeight();
         int width = scaleImage.getWidth();
-        int sleep = 100;
+        int sleep = 35;
         long countByte32 = 0;
         long countByte = 0;
         long sizePicture = height * width;
         for (int i = 0; i < height; i++) {
-            System.out.print("line ");
+            System.out.print("line");
             publish("Line:" + i);
             Charset cset = Charset.forName("Windows-1251");
-            ByteBuffer byteBuffer = cset.encode("line ");
+            ByteBuffer byteBuffer = cset.encode("line");
             byte[] bytes = byteBuffer.array();
             for (int k = 0; k < bytes.length; k++) {
                 serialPortOpen.writeByte(bytes[k]);
-                if (countByte32 > 31) {
+                if (countByte32 > 63) {
                     countByte32 = 0;
                     Thread.sleep(sleep);
                 }
@@ -84,7 +84,7 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
                 Color color = new Color(rgba, true);
                 int r = color.getRed();
                 System.out.print(r + " ");
-                if (countByte32 > 31) {
+                if (countByte32 > 63) {
                     countByte32 = 0;
                     Thread.sleep(sleep);
                 }
