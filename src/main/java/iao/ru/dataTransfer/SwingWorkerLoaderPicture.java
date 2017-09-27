@@ -60,19 +60,19 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
         graphics.dispose();
         int height = scaleImage.getHeight();
         int width = scaleImage.getWidth();
-        int sleep = 35;
+        int sleep = 22;// при 16 ошибки, при 17 ошибок нет(модулятор и демодулятор напрямую соединены по оптике)
         long countByte32 = 0;
         long countByte = 0;
         long sizePicture = height * width;
         for (int i = 0; i < height; i++) {
-            System.out.print("line");
+            //System.out.print("line");
             publish("Line:" + i);
             Charset cset = Charset.forName("Windows-1251");
             ByteBuffer byteBuffer = cset.encode("line");
             byte[] bytes = byteBuffer.array();
             for (int k = 0; k < bytes.length; k++) {
                 serialPortOpen.writeByte(bytes[k]);
-                if (countByte32 > 63) {
+                if (countByte32 > 31) {
                     countByte32 = 0;
                     Thread.sleep(sleep);
                 }
@@ -83,8 +83,8 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
                 int rgba = scaleImage.getRGB(j, i);
                 Color color = new Color(rgba, true);
                 int r = color.getRed();
-                System.out.print(r + " ");
-                if (countByte32 > 63) {
+                //System.out.print(r + " ");
+                if (countByte32 > 31) {
                     countByte32 = 0;
                     Thread.sleep(sleep);
                 }
@@ -93,11 +93,11 @@ public class SwingWorkerLoaderPicture extends SwingWorker<String, String> {
                 setProgress((int) ((countByte * 100) / sizePicture));
                 countByte++;
             }
-            System.out.println(" ");
+            //System.out.println(" ");
         }
         Date currentData = new Date();
         SimpleDateFormat format1 = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
-        System.out.println(format1.format(currentData));
+        //System.out.println(format1.format(currentData));
         try {
             File fileWrite = new File("Pictures is transmitted\\picture_" + format1.format(currentData) + ".bmp");
             fileWrite.mkdirs();
