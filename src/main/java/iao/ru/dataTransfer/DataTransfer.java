@@ -102,12 +102,15 @@ public class DataTransfer extends JFrame {
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("4800"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("9600"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("14400"));
-                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("1920"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("19200"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("38400"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("57600"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("115200"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("128000"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("230400"));
                 jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("256000"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("460800"));
+                jRadioButtonSpeedMenuItems.add(new JRadioButtonMenuItem("921600"));
 
                 jRadioButtonSpeedMenuItems.get(10).setSelected(true);
 

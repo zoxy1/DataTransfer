@@ -1,0 +1,13 @@
+
+**/target/
+
+.mvn
+
+**/out/
+.idea
+*.iws
+*.iml
+*.ipr
+*.ids
+logs
+^log.file_dir^^log.file_name^
