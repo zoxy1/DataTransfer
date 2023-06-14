@@ -1,11 +1,15 @@
 package iao.ru.dataTransfer;
 
-import java.awt.*;
+import jssc.SerialPort;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
-import jssc.*;
-
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -16,8 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Created by Zoxy1 on 20.07.17.
@@ -38,7 +40,7 @@ public class DataTransfer extends JFrame {
     private JLabel pictureLabel = new JLabel("");
     private File filePicture;
     private File fileText;
-    private JFrame frame = new JFrame("Data Transfer");
+    private JFrame frame = new JFrame("Remote controller");
     private BufferedImage bufferedImage;
     private ImagePanel imagePanel = new ImagePanel(pictureLabel);
     private JProgressBar progressBar = new JProgressBar();
@@ -47,6 +49,17 @@ public class DataTransfer extends JFrame {
     private SwingWorkerLoaderPicture loaderPicture = null;
     private JButton cancel = new JButton("Cancel");
     private JLabel pathPicture = new JLabel();
+    private JPanel aChannelPanel = new JPanel();
+    private JPanel bChannelPanel = new JPanel();
+    private JPanel channelPanelTextA = new JPanel();
+    private JPanel channelPanelTextB = new JPanel();
+    private JLabel aChanelLabel = new JLabel("Amplifier");
+    private JLabel bChanelLabel = new JLabel("Threshold");
+
+    private JLabel labelA = new JLabel();
+    ;
+    private JLabel labelB = new JLabel();
+    ;
 
     void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -61,13 +74,7 @@ public class DataTransfer extends JFrame {
                 JMenuBar menuBar = new JMenuBar();
                 JMenu fileMenu = new JMenu("File");
                 fileMenu.setFont(font);
-                JMenuItem openPictureMenuItem = new JMenuItem("Open file picture");
-                openPictureMenuItem.addActionListener(new OpenPictureActionListener());
-                openPictureMenuItem.setFont(font);
 
-                JMenuItem openTextMenuItem = new JMenuItem("Open file text");
-                openTextMenuItem.addActionListener(new OpenTextActionListener());
-                openTextMenuItem.setFont(font);
 
                 JMenuItem exitMenuItem = new JMenuItem("Exit");
                 exitMenuItem.setFont(font);
@@ -78,11 +85,10 @@ public class DataTransfer extends JFrame {
 
                 });
 
-                fileMenu.add(openPictureMenuItem);
-                fileMenu.add(openTextMenuItem);
+
                 fileMenu.addSeparator();
                 fileMenu.add(exitMenuItem);
-                menuBar.add(fileMenu);
+                //menuBar.add(fileMenu);
 
                 JMenu settingsMenu = new JMenu("Settings");
                 settingsMenu.setFont(font);
@@ -154,108 +160,107 @@ public class DataTransfer extends JFrame {
                     }
                 } catch (SerialPortException ex) {
                     System.out.println(ex);
-                    lineTextExeption.setText(ex.getExceptionType());
+                    lineTextExeption.setText("Not selected port");
                 }
                 menuBar.add(settingsMenu);
                 frame.setJMenuBar(menuBar);
-                frame.setPreferredSize(new Dimension(600, 500));
+                frame.setPreferredSize(new Dimension(400, 350));
                 frame.setLayout(new GridBagLayout());
                 JPanel filePathPanel = new JPanel();
                 filePathPanel.add(pictureLabel);
                 filePathPanel.setLayout(new GridBagLayout());
                 frame.add(filePathPanel, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 
-                imagePanel.setBorder(BorderFactory.createCompoundBorder(
+                aChannelPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-
-
-                GridBagConstraints gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 0; // расположение элемента по х
-                gridBagConstraints.gridy = 1; // расположение элемента по y
-                gridBagConstraints.gridwidth = 2; // количество элементов, которое будет занимать по горизонтали
-                gridBagConstraints.gridheight = 1; // количество элементов, которое будет занимать  по вертикали
-                gridBagConstraints.weightx = 0.9; //как должна осуществляться растяжка компонента
-                gridBagConstraints.weighty = 0.9;
-                gridBagConstraints.anchor = GridBagConstraints.CENTER;
-                gridBagConstraints.fill = GridBagConstraints.BOTH;
-                gridBagConstraints.insets = new Insets(1, 1, 1, 1); // отступы от компонета (top, left, down, right)
-                gridBagConstraints.ipadx = 0; // говорят о том на сколько будут увеличены минимальные размеры компонента
-                gridBagConstraints.ipady = 0;
-                /*imagePanel.setAutoscrolls(true);
-                imagePanel.setMinimumSize(new Dimension(163, 100));
-                imagePanel.setPreferredSize(new Dimension(490, 300));*/
-                frame.add(imagePanel, gridBagConstraints);
-
-                sendPictureButton.setLayout(new GridBagLayout());
-                frame.add(sendPictureButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
-                sendPictureButton.addActionListener(new SendFilePictureButtonActionListener());
-
-                pathPicture.setLayout(new GridBagLayout());
-                pathPicture.setBorder(BorderFactory.createCompoundBorder(
+                bChannelPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.gray, 2),
                         BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-                pathPicture.setText("Please open the file picture");
-                frame.add(pathPicture, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
+                // Создание модели ползунков
+                BoundedRangeModel model1 = new DefaultBoundedRangeModel(50, 0, 0, 100);
+                BoundedRangeModel model2 = new DefaultBoundedRangeModel(50, 0, 0, 100);
 
-                sendText.setLayout(new GridBagLayout());
-                sendText.addActionListener(new SendTextButtonActionListener());
-                frame.add(sendText, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
+                // Создание ползунков
+                JSlider slider1 = new JSlider(model1);
+                JSlider slider2 = new JSlider(model2);
 
-                fieldInText.setLayout(new GridBagLayout());
-                frame.add(fieldInText, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
-                lineTextExeption.setText("Select COM port");
-                lineTextExeption.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Color.gray, 2),
-                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
 
-                sendFile.setLayout(new GridBagLayout());
-                sendFile.addActionListener(new SendFileTextButtonActionListener());
-                frame.add(sendFile, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
+                // Настройка внешнего вида ползунков
+                slider1.setOrientation(JSlider.VERTICAL);
+                slider1.setMajorTickSpacing(50);
+                slider1.setMinorTickSpacing(10);
+                slider1.setPaintTicks(true);
+                slider2.setOrientation(JSlider.VERTICAL);
+                slider2.setMajorTickSpacing(50);
+                slider2.setMinorTickSpacing(10);
+                slider2.setPaintTicks(true);
 
-                pathText.setLayout(new GridBagLayout());
-                pathText.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Color.gray, 2),
-                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-                pathText.setText("Please open the file text");
-                frame.add(pathText, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
-
-                lineTextExeption.setText("Please select COM port");
-                lineTextExeption.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Color.gray, 2),
-                        BorderFactory.createEmptyBorder(1, 1, 1, 1)));
-
-                frame.add(cancel, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
-                cancel.addActionListener(new ActionListener() {
+                labelA.setText(String.valueOf(slider1.getValue()));
+                labelB.setText(String.valueOf(slider2.getValue()));
+                slider1.addChangeListener(new ChangeListener() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if(loaderText != null) {
-                            loaderText.cancel();
+                    public void stateChanged(ChangeEvent e) {
+                        int value = ((JSlider) e.getSource()).getValue();
+                        labelA.setText(String.valueOf(value));
+                        value = value * 4095 / 100;
+                        byte[] bytes =
+                                new byte[]{
+                                        (byte) ('A'),
+                                        (byte) (value >>> 8),
+                                        (byte) value};
+
+                        if (serialPortOpen.isOpened()) {
+                            try {
+                                serialPortOpen.writeBytes(bytes);
+                            } catch (SerialPortException e1) {
+                                lineTextExeption.setText("Not selected port");
+                            }
                         }
-                        if(loaderPicture != null) {
-                            loaderPicture.cancel();
+
+                    }
+                });
+                slider2.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        int value = ((JSlider) e.getSource()).getValue();
+                        labelB.setText(String.valueOf(value));
+                        value = value * 4095 / 100;
+                        byte[] bytes =
+                                new byte[]{
+                                        (byte) ('B'),
+                                        (byte) (value >>> 8),
+                                        (byte) value};
+
+                        if (serialPortOpen.isOpened()) {
+                            try {
+                                serialPortOpen.writeBytes(bytes);
+                            } catch (SerialPortException e1) {
+                                lineTextExeption.setText("Not selected port");
+                            }
                         }
+
                     }
                 });
 
-                progressBar.setMinimum(0);
-                progressBar.setMaximum(100);
-                progressBar.setStringPainted(true);
-                progressBar.setLayout(new GridBagLayout());
-                //progressBar.setMinimumSize(new Dimension(100, 20));
-                progressBar.setPreferredSize(new Dimension(360, 13));
-                progressBar.setForeground(new Color(0,191,32));
-                progressBarPanel.add(progressBar);
-                progressBarPanel.setVisible(false);
-                frame.add(progressBarPanel, new GridBagConstraints(1, 5, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
+                aChannelPanel.add(slider1);
+                bChannelPanel.add(slider2);
+                aChannelPanel.add(labelA);
+                bChannelPanel.add(labelB);
+                channelPanelTextA.add(aChanelLabel);
+                channelPanelTextB.add(bChanelLabel);
+
+                frame.add(channelPanelTextA, new GridBagConstraints(0, 2, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
+                frame.add(channelPanelTextB, new GridBagConstraints(1, 2, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
+                frame.add(aChannelPanel, new GridBagConstraints(0, 1, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
+                frame.add(bChannelPanel, new GridBagConstraints(1, 1, 1, 1, 0.9, 0.0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(1, 1, 1, 1), 0, 0));
 
                 frame.add(lineTextExeption, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0));
-                Font fontdevelopedBy = new Font("Verdana", Font.PLAIN, 8);
-                developedBy.setFont(fontdevelopedBy);
-                frame.add(developedBy, new GridBagConstraints(0, 7, 2, 1, 0.0, 0.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.LINE_END, new Insets(1, 1, 1, 1), 0, 0));
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
+
+
             }
         });
     }
@@ -268,17 +273,17 @@ public class DataTransfer extends JFrame {
                     Charset cset = Charset.forName("Windows-1251");
                     ByteBuffer byteBuffer = cset.encode(fieldInText.getText());
                     byte[] bytes = byteBuffer.array();
-                    int countByte32=0;
-                    for(int i=0;i<bytes.length;i++) {
+                    int countByte32 = 0;
+                    for (int i = 0; i < bytes.length; i++) {
                         if (countByte32 > 31) {
                             Thread.sleep(100);
-                            countByte32=0;
+                            countByte32 = 0;
                         }
                         serialPortOpen.writeByte(bytes[i]);
                         countByte32++;
                     }
                     lineTextExeption.setText("Text is transmitted");
-                    } catch (InterruptedException e1) {
+                } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 } catch (SerialPortException e1) {
                     e1.printStackTrace();
@@ -325,7 +330,7 @@ public class DataTransfer extends JFrame {
                 }
             } catch (SerialPortException ex) {
                 System.out.println(ex);
-                lineTextExeption.setText(ex.getExceptionType());
+                lineTextExeption.setText("Not selected port");
             }
         }
 
