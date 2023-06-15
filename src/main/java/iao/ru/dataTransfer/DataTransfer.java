@@ -203,7 +203,7 @@ public class DataTransfer extends JFrame {
                     public void stateChanged(ChangeEvent e) {
                         int value = ((JSlider) e.getSource()).getValue();
                         labelA.setText(String.valueOf(value));
-                        value = value * 4095 / 100;
+                        value = value * 1433 / 100;
                         byte[] bytes =
                                 new byte[]{
                                         (byte) ('A'),
